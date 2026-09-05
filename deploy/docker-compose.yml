@@ -79,9 +79,12 @@ services:
     build:
       context: ../web
       dockerfile: Dockerfile
+      # Jaringan host agar prarender dapat menghubungi API yang sedang berjalan
+      network: host
       args:
         NEXT_PUBLIC_SITE_URL: https://${DOMAIN:-dharmapati.co.id}
         NEXT_PUBLIC_API_URL: https://${DOMAIN:-dharmapati.co.id}
+        API_URL: ${API_URL_BANGUN:-http://127.0.0.1:5042}
     restart: unless-stopped
     depends_on:
       api: { condition: service_started }

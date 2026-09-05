@@ -8,8 +8,11 @@ RUN npm ci --no-audit --no-fund
 FROM dasar AS pembangun
 ARG NEXT_PUBLIC_SITE_URL=https://dharmapati.co.id
 ARG NEXT_PUBLIC_API_URL=https://dharmapati.co.id
+# Dipakai hanya saat prarender; bila API tak terjangkau, halaman memakai nilai cadangan
+ARG API_URL=http://127.0.0.1:5042
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
     NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+    API_URL=$API_URL \
     NEXT_TELEMETRY_DISABLED=1
 COPY --from=pemasangan /app/node_modules ./node_modules
 COPY . .

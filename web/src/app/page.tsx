@@ -141,9 +141,9 @@ export default async function Beranda() {
               </p>
             </div>
 
-            <div className="absolute -right-2 top-8 hidden rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur sm:block">
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Berdiri sejak</p>
-              <p className="font-judul text-2xl font-bold text-emas-400">2016</p>
+            <div className="absolute -right-3 top-6 hidden whitespace-nowrap rounded-2xl border border-emas-500/30 bg-navy-950/95 px-5 py-3.5 shadow-xl backdrop-blur lg:block">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emas-400">Berdiri sejak</p>
+              <p className="font-judul text-2xl font-bold text-white">2016</p>
             </div>
           </div>
         </div>

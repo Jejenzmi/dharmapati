@@ -15,10 +15,10 @@ export default function PetaKantor({ titik, tinggi = '420px' }: { titik: Titik[]
       const L = (await import('leaflet')).default
       if (batal || !wadah.current) return
       peta = L.map(wadah.current, { scrollWheelZoom: false })
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        maxZoom: 19,
-      }).addTo(peta)
+      L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Ubin peta &copy; <a href="https://www.esri.com/">Esri</a> — sumber: Esri, HERE, Garmin, &copy; kontributor OpenStreetMap', maxZoom: 18 },
+      ).addTo(peta)
 
       const ikon = L.divIcon({
         className: 'penanda-dharmapati',

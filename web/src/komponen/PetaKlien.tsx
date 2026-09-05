@@ -27,7 +27,7 @@ function penandaKlien(warna: string, aktif: boolean) {
 
 const penandaKantor = `
   <span class="relative flex h-[38px] w-[38px] items-center justify-center">
-    <span class="absolute h-full w-full rounded-full bg-[#0a1440]/20 animate-ping"></span>
+    <span class="absolute h-full w-full rounded-full bg-[#f5b301]/35 animate-ping"></span>
     <span class="relative flex h-[30px] w-[30px] items-center justify-center rounded-full border-[3px] border-[#f5b301] bg-[#0a1440] shadow-lg">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#f5b301" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v5.5c0 4.6 3.2 8.4 8 9.5 4.8-1.1 8-4.9 8-9.5V6l-8-3Z"/></svg>
     </span>
@@ -72,10 +72,15 @@ export default function PetaKlien({ klien, kantor = [], tinggi = '560px', ringka
         zoomControl: true,
         attributionControl: true,
       })
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19,
-      }).addTo(peta)
+      // Peta dasar Esri Light Gray: bersih, tanpa kunci API, penanda mudah terbaca
+      L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Ubin peta &copy; <a href="https://www.esri.com/">Esri</a> — sumber: Esri, HERE, Garmin, &copy; kontributor OpenStreetMap', maxZoom: 16 },
+      ).addTo(peta)
+      L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 16, pane: 'overlayPane' },
+      ).addTo(peta)
       peta.on('click', () => setTerpilih(null))
       petaRef.current = peta
       setSiap(true)

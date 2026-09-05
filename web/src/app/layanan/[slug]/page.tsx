@@ -12,8 +12,8 @@ export const revalidate = 600
 export const dynamicParams = true
 
 const GAMBAR: Record<string, string> = {
-  'jasa-pengamanan-satpam': FOTO.hormatKantor,
-  'pengawalan-vip-protokoler': FOTO.danru,
+  'jasa-pengamanan-satpam': FOTO.apel,
+  'pengawalan-vip-protokoler': FOTO.hormatKantor,
   'cleaning-service': FOTO.bersihLantai,
   'pengendalian-hama': FOTO.bersihToilet,
   'manpower-tenaga-produksi': FOTO.manpowerMesin,
