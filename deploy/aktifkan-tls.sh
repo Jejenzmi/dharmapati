@@ -6,8 +6,8 @@ DOMAIN="${DOMAIN:-dharmapati.co.id}"
 SUREL="${SUREL:-dharmapati02@gmail.com}"
 
 echo "› Memastikan DNS mengarah ke server ini"
-IP_SERVER="$(curl -fsS https://ifconfig.me || hostname -I | awk '{print $1}')"
-IP_DOMAIN="$(dig +short "$DOMAIN" A | tail -1)"
+IP_SERVER="$(curl -4 -fsS --max-time 10 https://ifconfig.me || hostname -I | awk '{print $1}')"
+IP_DOMAIN="$(dig +short "$DOMAIN" A @1.1.1.1 | tail -1)"
 if [ "$IP_SERVER" != "$IP_DOMAIN" ]; then
   echo "✗ $DOMAIN mengarah ke '${IP_DOMAIN:-kosong}', bukan $IP_SERVER."
   echo "  Arahkan A record $DOMAIN dan www.$DOMAIN ke $IP_SERVER lebih dulu."
