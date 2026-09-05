@@ -1,33 +1,29 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ambil, ambilPengaturan, type Personel } from '@/lib/api'
+import { ambilPengaturan } from '@/lib/api'
 import { FOTO } from '@/lib/foto'
+import { MENU } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
-import { AjakanBertindak, JudulBagian, KepalaHalaman } from '@/komponen/bagian'
+import { AjakanBertindak, JudulBagian, KepalaHalaman, Statistik, TautanSaudara } from '@/komponen/bagian'
 import { Centang, Gedung, Panah, Perisai, Titik } from '@/komponen/ikon'
 
 export const revalidate = 600
 
 export const metadata = buatMetadata({
-  judul: 'Tentang Kami — Sejarah, Visi Misi & Struktur Organisasi',
+  judul: 'Profil Perusahaan',
   deskripsi:
-    'Profil PT. Dharmapati Putra Nusantara: sejarah sejak 2016, filosofi lambang kuda, visi misi, biografi Direktur Utama purnawirawan Polisi Militer TNI AL, dan struktur organisasi perusahaan.',
+    'Profil PT. Dharmapati Putra Nusantara — perusahaan penyedia jasa pengamanan, cleaning service, dan pengelolaan tenaga kerja di Purwakarta yang berdiri sejak 2016 dan melayani empat provinsi.',
   jalur: '/tentang',
-  kataKunci: ['profil dharmapati', 'perusahaan jasa pengamanan purwakarta', 'sejarah dharmapati putra nusantara'],
+  kataKunci: ['profil dharmapati', 'perusahaan jasa pengamanan purwakarta', 'perusahaan outsourcing purwakarta'],
 })
 
 const REMAH = [{ nama: 'Beranda', jalur: '/' }, { nama: 'Tentang Kami', jalur: '/tentang' }]
+const SAUDARA = MENU.find((m) => m.label === 'Tentang')!.anak!
 
-export default async function Tentang() {
-  const [pengaturan, personel] = await Promise.all([
-    ambilPengaturan(),
-    ambil<Personel[]>('/personel'),
-  ])
-  const s = pengaturan.sejarah
-  const v = pengaturan.visiMisi
-  const d = pengaturan.direktur
-  const orang = personel ?? []
-  const tingkat = (n: number) => orang.filter((o) => o.tingkat === n)
+export default async function ProfilPerusahaan() {
+  const pengaturan = await ambilPengaturan()
+  const p = pengaturan.perusahaan
+  const k = pengaturan.kontak
 
   return (
     <>
@@ -35,34 +31,72 @@ export default async function Tentang() {
 
       <KepalaHalaman
         remah={REMAH}
-        label="Tentang kami"
+        label="Profil perusahaan"
         judul="Perusahaan jasa pengamanan dan pengelolaan tenaga kerja yang lahir dari disiplin militer"
         deskripsi="Berdiri sejak 2016 di Purwakarta, tumbuh menjadi penyedia tenaga pengamanan, kebersihan, dan tenaga kerja untuk industri serta instansi pemerintah di empat provinsi."
+        anak={
+          <div className="mt-10">
+            <Statistik
+              angka={[
+                { nilai: '2016', label: 'Tahun berdiri' },
+                { nilai: '9', label: 'Jenis layanan' },
+                { nilai: '4', label: 'Provinsi dilayani' },
+                { nilai: '3', label: 'Lokasi operasional' },
+              ]}
+            />
+          </div>
+        }
       />
 
-      {/* Filosofi & sejarah */}
       <section className="py-20 sm:py-24">
         <div className="wadah grid items-start gap-14 lg:grid-cols-[1fr_.85fr]">
           <div>
-            <JudulBagian label="Filosofi" judul="Mengapa kuda menjadi lambang kami" />
+            <JudulBagian label="Sekilas" judul="Siapa kami" />
             <div className="prosa">
-              <p>{s?.filosofi}</p>
-              <p className="rounded-2xl border-l-4 border-emas-500 bg-emas-50/60 px-6 py-5 font-judul text-lg font-bold text-navy-900">
-                {s?.arti}
+              <p>
+                <strong>{p?.nama}</strong> adalah perusahaan profesional di bidang penyediaan (recruitment)
+                dan pengelolaan tenaga kerja (outsourcing): tenaga pengamanan, manpower, cleaning service,
+                office boy, driver, operator forklift, serta tenaga kerja non-skill lainnya.
               </p>
-              <p>{s?.hubunganInduk}</p>
+              <p>
+                Kami dibentuk pada 27 Januari 2020 sebagai pengembangan dari {p?.induk}, untuk menjawab
+                keterbatasan tenaga pengamanan yang tersedia dari aparat pemerintah seiring meningkatnya
+                level ancaman — terutama di sektor industri, perbankan, dan perusahaan swasta lainnya.
+              </p>
+              <p>
+                Sampai hari ini kami berpengalaman mengelola keamanan dan tenaga kerja di berbagai lokasi:
+                instansi pemerintah, perkantoran, kawasan industri, perhotelan, pergudangan, dan perumahan.
+              </p>
             </div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 p-6">
-                <Gedung className="mb-3 h-6 w-6 text-emas-600" />
-                <h3 className="text-base font-bold">Kantor Pusat</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">{pengaturan.kontak?.alamatKantor}</p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {[
+                'Berizin operasional Polri dan terdaftar ABUJAPI',
+                'Anggota APKLINDO untuk lini cleaning service',
+                'Sistem manajemen mutu ISO 9001:2015',
+                'Pusdiklat sendiri di Gantar, Indramayu',
+              ].map((t) => (
+                <p key={t} className="flex items-start gap-2.5 text-sm text-slate-600">
+                  <Centang className="mt-0.5 h-4 w-4 shrink-0 text-emas-600" />{t}
+                </p>
+              ))}
+            </div>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 p-5">
+                <Gedung className="mb-3 h-5 w-5 text-emas-600" />
+                <h3 className="text-sm font-bold">Kantor Pusat</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{k?.alamatKantor}</p>
               </div>
-              <div className="rounded-2xl border border-slate-200 p-6">
-                <Titik className="mb-3 h-6 w-6 text-emas-600" />
-                <h3 className="text-base font-bold">Pusdiklat</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">{pengaturan.kontak?.alamatPusdiklat}</p>
+              <div className="rounded-2xl border border-slate-200 p-5">
+                <Gedung className="mb-3 h-5 w-5 text-emas-600" />
+                <h3 className="text-sm font-bold">Kantor Cabang</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{k?.alamatCabang}</p>
+              </div>
+              <div className="rounded-2xl border border-slate-200 p-5">
+                <Titik className="mb-3 h-5 w-5 text-emas-600" />
+                <h3 className="text-sm font-bold">Pusdiklat</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-600">{k?.alamatPusdiklat}</p>
               </div>
             </div>
           </div>
@@ -79,136 +113,21 @@ export default async function Tentang() {
         </div>
       </section>
 
-      {/* Tonggak sejarah */}
-      <section className="relative overflow-hidden bg-navy-950 py-20 sm:py-24">
-        <div className="pointer-events-none absolute inset-0 bg-grid-halus opacity-60" aria-hidden="true" />
-        <div className="wadah relative">
-          <JudulBagian gelap tengah label="Perjalanan" judul="Tonggak penting perusahaan" />
-          <ol className="relative mx-auto max-w-3xl border-l border-white/15 pl-8">
-            {(s?.tonggak ?? []).map((t) => (
-              <li key={t.tahun} className="relative mb-10 last:mb-0">
-                <span className="absolute -left-[41px] flex h-6 w-6 items-center justify-center rounded-full border-2 border-emas-500 bg-navy-950">
-                  <span className="h-2 w-2 rounded-full bg-emas-500" />
-                </span>
-                <span className="font-judul text-2xl font-bold text-emas-400">{t.tahun}</span>
-                <h3 className="mt-1 text-lg font-bold !text-white">{t.judul}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-slate-400">{t.isi}</p>
-              </li>
-            ))}
-          </ol>
+      <section className="bg-navy-950 py-16">
+        <div className="wadah flex flex-col items-center gap-6 text-center lg:flex-row lg:justify-between lg:text-left">
+          <div className="max-w-2xl">
+            <span className="label-bagian-gelap"><Perisai className="h-3.5 w-3.5" /> Legalitas</span>
+            <h2 className="mt-4 text-2xl font-bold !text-white sm:text-3xl">Semua perizinan bisa Anda periksa</h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-400">
+              Akta pendirian, pengesahan AHU, NIB, SPPKP, SIO Polri, keanggotaan ABUJAPI dan APKLINDO,
+              hingga sertifikat ISO 9001:2015.
+            </p>
+          </div>
+          <Link href="/legalitas" className="tombol-utama shrink-0">Lihat Legalitas <Panah className="h-4 w-4" /></Link>
         </div>
       </section>
 
-      {/* Direktur */}
-      <section className="py-20 sm:py-24">
-        <div className="wadah grid items-center gap-14 lg:grid-cols-[.8fr_1.2fr]">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-3xl bg-navy-950">
-            <Image src={FOTO.direktur} alt={`${d?.nama}, ${d?.jabatan} PT. Dharmapati Putra Nusantara`} fill sizes="(max-width:1024px) 80vw, 32vw" className="object-cover object-top" />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-950 to-transparent p-6 pt-16">
-              <p className="font-judul text-xl font-bold text-white">{d?.nama}</p>
-              <p className="text-sm text-emas-400">{d?.jabatan}</p>
-            </div>
-          </div>
-          <div>
-            <JudulBagian label="Sambutan direktur" judul="“Pengamanan yang baik dimulai dari dokumen, bukan dari jumlah orang”" />
-            <div className="prosa">
-              {(d?.paragraf ?? []).map((p) => <p key={p.slice(0, 28)}>{p}</p>)}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Visi misi */}
-      <section className="bg-slate-50 py-20 sm:py-24">
-        <div className="wadah">
-          <JudulBagian tengah label="Arah perusahaan" judul="Visi, misi, dan pedoman kerja" />
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-white p-8">
-              <span className="label-bagian"><Perisai className="h-3.5 w-3.5" /> Lini pengamanan</span>
-              <h3 className="mt-5 text-lg font-bold">Visi</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{v?.visiKeamanan}</p>
-              <h3 className="mt-6 text-lg font-bold">Misi</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{v?.misiKeamanan}</p>
-            </div>
-            <div className="rounded-3xl border border-slate-200 bg-white p-8">
-              <span className="label-bagian">Lini fasilitas &amp; tenaga kerja</span>
-              <h3 className="mt-5 text-lg font-bold">Visi</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{v?.visiFasilitas}</p>
-              <h3 className="mt-6 text-lg font-bold">Misi</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{v?.misiFasilitas}</p>
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-6 lg:grid-cols-3">
-            <div className="rounded-3xl bg-navy-950 p-8 text-white">
-              <h3 className="text-lg font-bold !text-white">Sikap Dharmapati</h3>
-              <p className="mt-2 text-sm text-slate-400">Empat sikap yang ditanamkan sejak pembekalan.</p>
-              <ul className="mt-5 flex flex-wrap gap-2">
-                {(pengaturan.perusahaan?.sikap ?? []).map((x) => (
-                  <li key={x} className="rounded-full bg-emas-500/15 px-4 py-1.5 text-sm font-bold text-emas-300">{x}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-3xl border border-slate-200 bg-white p-8">
-              <h3 className="text-lg font-bold">Pedoman 5R</h3>
-              <ul className="mt-4 space-y-2">
-                {(v?.pedoman5R ?? []).map((x) => (
-                  <li key={x} className="flex items-center gap-2 text-sm text-slate-600"><Centang className="h-4 w-4 text-emas-600" />{x}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-3xl border border-slate-200 bg-white p-8">
-              <h3 className="text-lg font-bold">Pedoman 5 DM</h3>
-              <ul className="mt-4 space-y-2">
-                {(v?.pedoman5DM ?? []).map((x) => (
-                  <li key={x} className="flex items-center gap-2 text-sm text-slate-600"><Centang className="h-4 w-4 text-emas-600" />{x}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Struktur organisasi */}
-      {orang.length > 0 && (
-        <section className="py-20 sm:py-24">
-          <div className="wadah">
-            <JudulBagian tengah label="Struktur organisasi" judul="Orang-orang di balik Dharmapati" deskripsi="Pengawasan berjenjang memastikan setiap penempatan punya penanggung jawab yang jelas." />
-
-            <div className="space-y-8">
-              {[
-                { n: 1, l: 'Dewan & Direksi' },
-                { n: 2, l: 'Penasehat' },
-                { n: 3, l: 'Manajemen Senior' },
-                { n: 4, l: 'Manajer' },
-                { n: 5, l: 'Staf' },
-              ].map((lapis) => {
-                const isi = tingkat(lapis.n)
-                if (!isi.length) return null
-                return (
-                  <div key={lapis.n}>
-                    <p className="mb-4 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400">{lapis.l}</p>
-                    <div className="flex flex-wrap justify-center gap-4">
-                      {isi.map((o) => (
-                        <div key={o.id} className="w-full max-w-[220px] rounded-2xl border border-slate-200 bg-white p-5 text-center transition hover:border-emas-300 hover:shadow-lg">
-                          <p className="text-sm font-bold text-navy-900">{o.nama}</p>
-                          <p className="mt-1 text-xs text-emas-700">{o.jabatan}</p>
-                          {o.bio && <p className="mt-2 text-[11px] leading-relaxed text-slate-500">{o.bio}</p>}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            <div className="mt-12 text-center">
-              <Link href="/legalitas" className="tombol-navy">Lihat legalitas perusahaan <Panah className="h-4 w-4" /></Link>
-            </div>
-          </div>
-        </section>
-      )}
-
+      <TautanSaudara butir={SAUDARA} jalurKini="/tentang" judul="Selengkapnya tentang kami" />
       <AjakanBertindak />
     </>
   )

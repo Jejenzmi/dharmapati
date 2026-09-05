@@ -92,3 +92,40 @@ export function Statistik({ angka }: { angka: { label: string; nilai: string; ke
     </dl>
   )
 }
+
+/** Tautan ke halaman saudara dalam satu cabang menu — membantu navigasi dan tautan internal. */
+export function TautanSaudara({
+  judul = 'Selanjutnya di bagian ini',
+  butir,
+  jalurKini,
+}: {
+  judul?: string
+  butir: { label: string; jalur: string; ringkas?: string }[]
+  jalurKini: string
+}) {
+  const lain = butir.filter((b) => b.jalur !== jalurKini)
+  if (!lain.length) return null
+  return (
+    <section className="border-t border-slate-200 bg-slate-50 py-14">
+      <div className="wadah">
+        <h2 className="mb-6 text-xs font-bold uppercase tracking-[0.2em] text-slate-400">{judul}</h2>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {lain.map((b) => (
+            <li key={b.jalur}>
+              <Link
+                href={b.jalur}
+                className="group flex h-full flex-col rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-1 hover:border-emas-300 hover:shadow-lg"
+              >
+                <span className="text-sm font-bold text-navy-900 transition group-hover:text-emas-700">{b.label}</span>
+                {b.ringkas && <span className="mt-1.5 flex-1 text-xs leading-relaxed text-slate-500">{b.ringkas}</span>}
+                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-navy-700 transition group-hover:gap-2.5">
+                  Buka <Panah className="h-3.5 w-3.5" />
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}

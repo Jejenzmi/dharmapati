@@ -6,7 +6,7 @@ import { Panah, Silang } from './ikon'
 
 export type Butir = { gambar: string; judul: string; kategori: string; keterangan?: string | null }
 
-export default function Galeri({ butir }: { butir: Butir[] }) {
+export default function Galeri({ butir, tanpaSaring = false }: { butir: Butir[]; tanpaSaring?: boolean }) {
   const kategori = useMemo(() => ['Semua', ...Array.from(new Set(butir.map((b) => b.kategori)))], [butir])
   const [aktif, setAktif] = useState('Semua')
   const [indeks, setIndeks] = useState<number | null>(null)
@@ -35,7 +35,7 @@ export default function Galeri({ butir }: { butir: Butir[] }) {
 
   return (
     <>
-      <div className="mb-8 flex flex-wrap gap-2">
+      <div className={`mb-8 flex-wrap gap-2 ${tanpaSaring ? 'hidden' : 'flex'}`}>
         {kategori.map((k) => (
           <button
             key={k}

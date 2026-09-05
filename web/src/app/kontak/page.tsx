@@ -1,32 +1,28 @@
 import { Suspense } from 'react'
+import Link from 'next/link'
 import { ambilPengaturan } from '@/lib/api'
+import { MENU } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
-import { JudulBagian, KepalaHalaman } from '@/komponen/bagian'
-import { Amplop, Jam, Telepon, Titik, Wa } from '@/komponen/ikon'
+import { JudulBagian, KepalaHalaman, TautanSaudara } from '@/komponen/bagian'
+import { Amplop, Jam, Panah, Telepon, Titik, Wa } from '@/komponen/ikon'
 import FormulirKontak from '@/komponen/FormulirKontak'
-import PetaKantor from '@/komponen/PetaKantor'
 
 export const revalidate = 3600
 
 export const metadata = buatMetadata({
-  judul: 'Hubungi Kami — Minta Penawaran Jasa Pengamanan & Cleaning Service',
+  judul: 'Minta Penawaran',
   deskripsi:
-    'Hubungi PT. Dharmapati Putra Nusantara di Purwakarta, kantor cabang Kelapa Gading Jakarta Utara, atau Pusdiklat Gantar Indramayu. Kirim permintaan penawaran melalui formulir daring, telepon, atau WhatsApp.',
+    'Kirim permintaan penawaran jasa pengamanan, cleaning service, atau tenaga kerja ke PT. Dharmapati Putra Nusantara. Tim survei menghubungi Anda dan penawaran resmi diserahkan maksimal 3 hari kerja.',
   jalur: '/kontak',
-  kataKunci: ['kontak jasa keamanan purwakarta', 'penawaran satpam', 'alamat dharmapati putra nusantara'],
+  kataKunci: ['kontak jasa keamanan purwakarta', 'penawaran satpam', 'harga jasa cleaning service'],
 })
 
 const REMAH = [{ nama: 'Beranda', jalur: '/' }, { nama: 'Kontak', jalur: '/kontak' }]
+const SAUDARA = MENU.find((m) => m.label === 'Kontak')!.anak!
 
 export default async function HalamanKontak() {
   const pengaturan = await ambilPengaturan()
   const k = pengaturan.kontak!
-
-  const titik = [
-    { nama: 'Kantor Pusat', jenis: 'Head Office', alamat: k.alamatKantor, ...k.petaKantor },
-    { nama: 'Kantor Cabang', jenis: 'Branch Office', alamat: k.alamatCabang, ...k.petaCabang },
-    { nama: 'Pusdiklat Dharmapati', jenis: 'Pusat Pendidikan & Pelatihan', alamat: k.alamatPusdiklat, ...k.petaPusdiklat },
-  ]
 
   return (
     <>
@@ -34,7 +30,7 @@ export default async function HalamanKontak() {
 
       <KepalaHalaman
         remah={REMAH}
-        label="Hubungi kami"
+        label="Minta penawaran"
         judul="Ceritakan kebutuhan objek Anda"
         deskripsi="Isi formulir di bawah, atau hubungi kami langsung. Untuk permintaan penawaran, tim survei akan menghubungi Anda menjadwalkan kunjungan lokasi."
       />
@@ -79,31 +75,32 @@ export default async function HalamanKontak() {
               </a>
             </div>
 
-            {[
-              { j: 'Kantor Pusat', a: k.alamatKantor },
-              { j: 'Kantor Cabang', a: k.alamatCabang },
-              { j: 'Pusdiklat', a: k.alamatPusdiklat },
-            ].map((x) => (
-              <div key={x.j} className="rounded-2xl border border-slate-200 p-6">
-                <div className="mb-2 flex items-center gap-2">
-                  <Titik className="h-4 w-4 text-emas-600" />
-                  <h2 className="text-sm font-bold uppercase tracking-wide text-navy-900">{x.j}</h2>
-                </div>
-                <p className="text-sm leading-relaxed text-slate-600">{x.a}</p>
+            <div className="rounded-3xl border border-slate-200 p-7">
+              <div className="mb-2 flex items-center gap-2">
+                <Titik className="h-4 w-4 text-emas-600" />
+                <h2 className="text-sm font-bold uppercase tracking-wide text-navy-900">Kantor Pusat</h2>
               </div>
-            ))}
+              <p className="text-sm leading-relaxed text-slate-600">{k.alamatKantor}</p>
+              <Link href="/kontak/lokasi" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-navy-800 hover:text-emas-600">
+                Lihat semua lokasi &amp; peta <Panah className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 p-7">
+              <h2 className="text-base font-bold">Yang perlu kami tahu</h2>
+              <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-600">
+                <li>Lokasi dan luas area objek</li>
+                <li>Jumlah pos dan shift yang diinginkan</li>
+                <li>Jam operasional</li>
+                <li>Kebutuhan perlengkapan khusus</li>
+                <li>Target waktu mulai</li>
+              </ul>
+            </div>
           </aside>
         </div>
       </section>
 
-      <section className="bg-slate-50 py-16 sm:py-20">
-        <div className="wadah">
-          <JudulBagian tengah label="Lokasi" judul="Kantor dan Pusdiklat kami" deskripsi="Tiga titik operasional: kantor pusat Purwakarta, kantor cabang Jakarta Utara, dan pusat pendidikan di Indramayu." />
-          <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white p-2 shadow-xl shadow-navy-900/5">
-            <PetaKantor titik={titik} tinggi="440px" />
-          </div>
-        </div>
-      </section>
+      <TautanSaudara butir={SAUDARA} jalurKini="/kontak" judul="Informasi lain" />
     </>
   )
 }

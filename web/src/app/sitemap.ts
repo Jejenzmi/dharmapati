@@ -1,45 +1,40 @@
 import type { MetadataRoute } from 'next'
-import { ambil, ASAL_SITUS } from '@/lib/api'
+import { ambil, ASAL_SITUS, type Layanan } from '@/lib/api'
+import { JALUR_STATIS, slugDariLini } from '@/lib/navigasi'
 
 type Ringkas = { slug: string; diubahAt: string }
 
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const data = await ambil<{ layanan: Ringkas[]; artikel: Ringkas[]; lowongan: Ringkas[] }>('/peta-situs', { revalidate: 3600 })
+  const [peta, layanan] = await Promise.all([
+    ambil<{ artikel: Ringkas[]; lowongan: Ringkas[] }>('/peta-situs', { revalidate: 3600 }),
+    ambil<Layanan[]>('/layanan', { revalidate: 3600 }),
+  ])
 
-  const statis: MetadataRoute.Sitemap = [
-    { url: '/', prioritas: 1, ubah: 'weekly' },
-    { url: '/tentang', prioritas: 0.9, ubah: 'monthly' },
-    { url: '/layanan', prioritas: 0.9, ubah: 'monthly' },
-    { url: '/klien', prioritas: 0.85, ubah: 'weekly' },
-    { url: '/legalitas', prioritas: 0.8, ubah: 'yearly' },
-    { url: '/galeri', prioritas: 0.6, ubah: 'monthly' },
-    { url: '/karier', prioritas: 0.8, ubah: 'weekly' },
-    { url: '/artikel', prioritas: 0.7, ubah: 'weekly' },
-    { url: '/faq', prioritas: 0.6, ubah: 'monthly' },
-    { url: '/kontak', prioritas: 0.9, ubah: 'yearly' },
-  ].map((s) => ({
-    url: `${ASAL_SITUS}${s.url}`,
-    lastModified: new Date(),
-    changeFrequency: s.ubah as 'weekly',
+  const sekarang = new Date()
+
+  const statis: MetadataRoute.Sitemap = JALUR_STATIS.map((s) => ({
+    url: `${ASAL_SITUS}${s.jalur}`,
+    lastModified: sekarang,
+    changeFrequency: s.ubah,
     priority: s.prioritas,
   }))
 
   const dinamis: MetadataRoute.Sitemap = [
-    ...(data?.layanan ?? []).map((l) => ({
-      url: `${ASAL_SITUS}/layanan/${l.slug}`,
-      lastModified: new Date(l.diubahAt),
+    ...(layanan ?? []).map((l) => ({
+      url: `${ASAL_SITUS}/layanan/${slugDariLini(l.lini)}/${l.slug}`,
+      lastModified: sekarang,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
-    ...(data?.artikel ?? []).map((a) => ({
+    ...(peta?.artikel ?? []).map((a) => ({
       url: `${ASAL_SITUS}/artikel/${a.slug}`,
       lastModified: new Date(a.diubahAt),
       changeFrequency: 'monthly' as const,
       priority: 0.6,
     })),
-    ...(data?.lowongan ?? []).map((l) => ({
+    ...(peta?.lowongan ?? []).map((l) => ({
       url: `${ASAL_SITUS}/karier/${l.slug}`,
       lastModified: new Date(l.diubahAt),
       changeFrequency: 'weekly' as const,

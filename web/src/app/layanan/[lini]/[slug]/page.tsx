@@ -1,9 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { ambil, type Layanan } from '@/lib/api'
 import { FOTO } from '@/lib/foto'
-import { NAMA_LINI, keHtml } from '@/lib/format'
+import { keHtml } from '@/lib/format'
+import { liniDariSlug, slugDariLini } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldLayanan, ldRemah } from '@/lib/seo'
 import { AjakanBertindak, KepalaHalaman } from '@/komponen/bagian'
 import { Centang, IkonLayanan, Panah, Titik } from '@/komponen/ikon'
@@ -25,48 +26,48 @@ const GAMBAR: Record<string, string> = {
 
 export async function generateStaticParams() {
   const layanan = (await ambil<Layanan[]>('/layanan')) ?? []
-  return layanan.map((l) => ({ slug: l.slug }))
+  return layanan.map((l) => ({ lini: slugDariLini(l.lini), slug: l.slug }))
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export async function generateMetadata({ params }: { params: Promise<{ lini: string; slug: string }> }) {
+  const { lini, slug } = await params
   const l = await ambil<Layanan>(`/layanan/${slug}`)
-  if (!l) return buatMetadata({ judul: 'Layanan tidak ditemukan', deskripsi: 'Halaman layanan tidak tersedia.', jalur: `/layanan/${slug}`, tanpaIndeks: true })
+  if (!l) return buatMetadata({ judul: 'Layanan tidak ditemukan', deskripsi: 'Halaman layanan tidak tersedia.', jalur: `/layanan/${lini}/${slug}`, tanpaIndeks: true })
   return buatMetadata({
     judul: l.seoJudul ?? l.nama,
     deskripsi: l.seoDesk ?? l.ringkasan,
-    jalur: `/layanan/${l.slug}`,
+    jalur: `/layanan/${slugDariLini(l.lini)}/${l.slug}`,
     kataKunci: [l.nama.toLowerCase(), `${l.nama.toLowerCase()} purwakarta`, `${l.nama.toLowerCase()} karawang`],
   })
 }
 
-export default async function RincianLayanan({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+export default async function RincianLayanan({ params }: { params: Promise<{ lini: string; slug: string }> }) {
+  const { lini, slug } = await params
   const [layanan, semua] = await Promise.all([
     ambil<Layanan>(`/layanan/${slug}`),
     ambil<Layanan[]>('/layanan'),
   ])
   if (!layanan) notFound()
 
+  const liniBenar = slugDariLini(layanan.lini)
+  if (lini !== liniBenar) permanentRedirect(`/layanan/${liniBenar}/${layanan.slug}`)
+
+  const info = liniDariSlug(liniBenar)!
   const lain = (semua ?? []).filter((x) => x.slug !== layanan.slug && x.lini === layanan.lini).slice(0, 3)
   const remah = [
     { nama: 'Beranda', jalur: '/' },
     { nama: 'Layanan', jalur: '/layanan' },
-    { nama: layanan.nama, jalur: `/layanan/${layanan.slug}` },
+    { nama: info.label, jalur: `/layanan/${info.slug}` },
+    { nama: layanan.nama, jalur: `/layanan/${info.slug}/${layanan.slug}` },
   ]
   const gambar = layanan.gambar ?? GAMBAR[layanan.slug] ?? FOTO.hormat
 
   return (
     <>
       <DataTerstruktur data={ldRemah(remah)} />
-      <DataTerstruktur data={ldLayanan(layanan)} />
+      <DataTerstruktur data={ldLayanan({ ...layanan, slug: `${info.slug}/${layanan.slug}` })} />
 
-      <KepalaHalaman
-        remah={remah}
-        label={NAMA_LINI[layanan.lini]}
-        judul={layanan.nama}
-        deskripsi={layanan.ringkasan}
-      />
+      <KepalaHalaman remah={remah} label={info.label} judul={layanan.nama} deskripsi={layanan.ringkasan} />
 
       <section className="py-16 sm:py-20">
         <div className="wadah grid gap-12 lg:grid-cols-[1.4fr_.8fr]">
@@ -141,10 +142,15 @@ export default async function RincianLayanan({ params }: { params: Promise<{ slu
       {lain.length > 0 && (
         <section className="bg-slate-50 py-16 sm:py-20">
           <div className="wadah">
-            <h2 className="mb-8 text-2xl font-bold">Layanan lain di lini {NAMA_LINI[layanan.lini]}</h2>
+            <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+              <h2 className="text-2xl font-bold">Layanan lain di lini {info.label}</h2>
+              <Link href={`/layanan/${info.slug}`} className="inline-flex items-center gap-2 text-sm font-bold text-navy-800 hover:text-emas-600">
+                Semua layanan {info.label.toLowerCase()} <Panah className="h-4 w-4" />
+              </Link>
+            </div>
             <div className="grid gap-6 md:grid-cols-3">
               {lain.map((s) => (
-                <Link key={s.id} href={`/layanan/${s.slug}`} className="kartu group">
+                <Link key={s.id} href={`/layanan/${info.slug}/${s.slug}`} className="kartu group">
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-emas-500/10 text-emas-600">
                     <IkonLayanan nama={s.ikon} className="h-5 w-5" />
                   </span>

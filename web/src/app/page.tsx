@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ambil, PENGATURAN_CADANGAN, type DataBeranda } from '@/lib/api'
 import { FOTO } from '@/lib/foto'
 import { NAMA_LINI, tanggalId } from '@/lib/format'
+import { slugDariLini } from '@/lib/navigasi'
 import { AjakanBertindak, JudulBagian, Statistik } from '@/komponen/bagian'
 import { buatMetadata } from '@/lib/seo'
 import { Berkas, Centang, IkonLayanan, Panah, Perisai, Peta, Titik, TopiWisuda } from '@/komponen/ikon'
@@ -32,7 +33,7 @@ const PILAR = [
     ikon: 'shield',
     isi: 'Satpam bersertifikat Gada Pratama, pengawalan VIP, dan pengamanan objek vital dengan RENPAM tertulis di setiap lokasi.',
     warna: 'from-emas-500/20 to-emas-500/0',
-    tautan: '/layanan?lini=KEAMANAN',
+    tautan: '/layanan/pengamanan',
   },
   {
     kunci: 'KEBERSIHAN',
@@ -40,7 +41,7 @@ const PILAR = [
     ikon: 'sparkles',
     isi: 'Cleaning service gedung, rumah sakit, dan kawasan industri dengan pedoman 5R serta pengendalian hama terjadwal.',
     warna: 'from-sky-400/20 to-sky-400/0',
-    tautan: '/layanan?lini=KEBERSIHAN',
+    tautan: '/layanan/kebersihan',
   },
   {
     kunci: 'TENAGA_KERJA',
@@ -48,7 +49,7 @@ const PILAR = [
     ikon: 'users',
     isi: 'Manpower produksi, office boy, pramusaji, driver, dan operator forklift lengkap dengan pengelolaan BPJS dan upah.',
     warna: 'from-emerald-400/20 to-emerald-400/0',
-    tautan: '/layanan?lini=TENAGA_KERJA',
+    tautan: '/layanan/tenaga-kerja',
   },
 ]
 
@@ -262,7 +263,7 @@ export default async function Beranda() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {layanan.map((l) => (
-              <Link key={l.id} href={`/layanan/${l.slug}`} className="kartu group flex flex-col">
+              <Link key={l.id} href={`/layanan/${slugDariLini(l.lini)}/${l.slug}`} className="kartu group flex flex-col">
                 <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emas-500/10 text-emas-600 transition group-hover:bg-emas-500 group-hover:text-navy-950">
                   <IkonLayanan nama={l.ikon} className="h-6 w-6" />
                 </span>
@@ -347,7 +348,7 @@ export default async function Beranda() {
                 </div>
               ))}
             </div>
-            <Link href="/layanan/pelatihan-sertifikasi" className="tombol-navy mt-8">
+            <Link href="/layanan/pendukung/pelatihan-sertifikasi" className="tombol-navy mt-8">
               Pelatihan untuk perusahaan Anda <Panah className="h-4 w-4" />
             </Link>
           </div>

@@ -7,28 +7,33 @@ const TAUTAN = [
   {
     judul: 'Perusahaan',
     butir: [
-      { label: 'Tentang Kami', jalur: '/tentang' },
+      { label: 'Profil Perusahaan', jalur: '/tentang' },
+      { label: 'Sejarah & Filosofi', jalur: '/tentang/sejarah' },
+      { label: 'Visi & Misi', jalur: '/tentang/visi-misi' },
+      { label: 'Struktur Organisasi', jalur: '/tentang/struktur-organisasi' },
       { label: 'Legalitas & Perizinan', jalur: '/legalitas' },
-      { label: 'Klien & Jangkauan', jalur: '/klien' },
-      { label: 'Galeri Kegiatan', jalur: '/galeri' },
     ],
   },
   {
     judul: 'Layanan',
     butir: [
-      { label: 'Jasa Pengamanan (Satpam)', jalur: '/layanan/jasa-pengamanan-satpam' },
-      { label: 'Cleaning Service', jalur: '/layanan/cleaning-service' },
-      { label: 'Manpower & Tenaga Produksi', jalur: '/layanan/manpower-tenaga-produksi' },
+      { label: 'Jasa Pengamanan (Satpam)', jalur: '/layanan/pengamanan/jasa-pengamanan-satpam' },
+      { label: 'Cleaning Service', jalur: '/layanan/kebersihan/cleaning-service' },
+      { label: 'Manpower & Tenaga Produksi', jalur: '/layanan/tenaga-kerja/manpower-tenaga-produksi' },
+      { label: 'Layanan Pendukung', jalur: '/layanan/pendukung' },
       { label: 'Semua Layanan', jalur: '/layanan' },
     ],
   },
   {
     judul: 'Informasi',
     butir: [
-      { label: 'Karier', jalur: '/karier' },
+      { label: 'Klien & Jangkauan', jalur: '/klien' },
+      { label: 'Galeri Kegiatan', jalur: '/galeri' },
+      { label: 'Lowongan Kerja', jalur: '/karier' },
+      { label: 'Proses Seleksi', jalur: '/karier/proses-seleksi' },
       { label: 'Artikel & Wawasan', jalur: '/artikel' },
       { label: 'Tanya Jawab', jalur: '/faq' },
-      { label: 'Hubungi Kami', jalur: '/kontak' },
+      { label: 'Lokasi Kantor', jalur: '/kontak/lokasi' },
     ],
   },
 ]
