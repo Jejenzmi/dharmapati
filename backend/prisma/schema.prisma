@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Peran {
+  ADMIN
+  EDITOR
+}
+
+enum LiniLayanan {
+  KEAMANAN
+  KEBERSIHAN
+  TENAGA_KERJA
+  PENDUKUNG
+}
+
+model Pengguna {
+  id        String   @id @default(cuid())
+  nama      String
+  username  String   @unique
+  email     String?  @unique
+  kataSandi String
+  peran     Peran    @default(EDITOR)
+  aktif     Boolean  @default(true)
+  dibuatAt  DateTime @default(now())
+  diubahAt  DateTime @updatedAt
+
+  @@map("pengguna")
+}
+
+model Layanan {
+  id        String      @id @default(cuid())
+  slug      String      @unique
+  nama      String
+  lini      LiniLayanan
+  ikon      String      @default("shield")
+  ringkasan String
+  deskripsi String
+  fitur     String[]    @default([])
+  cakupan   String[]    @default([])
+  gambar    String?
+  urutan    Int         @default(0)
+  unggulan  Boolean     @default(false)
+  terbit    Boolean     @default(true)
+  seoJudul  String?
+  seoDesk   String?
+  dibuatAt  DateTime    @default(now())
+  diubahAt  DateTime    @updatedAt
+
+  @@index([lini, terbit])
+  @@map("layanan")
+}
+
+model Klien {
+  id        String      @id @default(cuid())
+  nama      String
+  slug      String      @unique
+  kota      String
+  provinsi  String
+  alamat    String?
+  lat       Float
+  lng       Float
+  sektor    String
+  lini      LiniLayanan @default(KEAMANAN)
+  layananT  String[]    @default([])
+  logo      String?
+  sejakThn  Int?
+  jumlahPer Int?
+  terbit    Boolean     @default(true)
+  urutan    Int         @default(0)
+  dibuatAt  DateTime    @default(now())
+  diubahAt  DateTime    @updatedAt
+
+  @@index([provinsi])
+  @@index([terbit])
+  @@map("klien")
+}
+
+model Legalitas {
+  id       String   @id @default(cuid())
+  label    String
+  nomor    String
+  penerbit String?
+  tanggal  String?
+  catatan  String?
+  urutan   Int      @default(0)
+  dibuatAt DateTime @default(now())
+  diubahAt DateTime @updatedAt
+
+  @@map("legalitas")
+}
+
+model Kbli {
+  id       String   @id @default(cuid())
+  kode     String   @unique
+  judul    String
+  lini     LiniLayanan @default(PENDUKUNG)
+  urutan   Int      @default(0)
+  dibuatAt DateTime @default(now())
+
+  @@map("kbli")
+}
+
+model Personel {
+  id       String   @id @default(cuid())
+  nama     String
+  jabatan  String
+  tingkat  Int      @default(3)
+  induk    String?
+  foto     String?
+  bio      String?
+  urutan   Int      @default(0)
+  terbit   Boolean  @default(true)
+  dibuatAt DateTime @default(now())
+  diubahAt DateTime @updatedAt
+
+  @@map("personel")
+}
+
+model Galeri {
+  id        String   @id @default(cuid())
+  judul     String
+  kategori  String
+  gambar    String
+  keterangan String?
+  urutan    Int      @default(0)
+  terbit    Boolean  @default(true)
+  dibuatAt  DateTime @default(now())
+
+  @@index([kategori])
+  @@map("galeri")
+}
+
+model Artikel {
+  id         String    @id @default(cuid())
+  slug       String    @unique
+  judul      String
+  ringkasan  String
+  isi        String
+  sampul     String?
+  kategori   String    @default("Berita")
+  tag        String[]  @default([])
+  penulis    String    @default("Redaksi Dharmapati")
+  terbit     Boolean   @default(true)
+  terbitAt   DateTime  @default(now())
+  dilihat    Int       @default(0)
+  seoJudul   String?
+  seoDesk    String?
+  dibuatAt   DateTime  @default(now())
+  diubahAt   DateTime  @updatedAt
+
+  @@index([terbit, terbitAt])
+  @@map("artikel")
+}
+
+model Lowongan {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  posisi     String
+  lokasi     String
+  tipe       String   @default("Penuh Waktu")
+  penempatan String?
+  deskripsi  String
+  syarat     String[] @default([])
+  gaji       String?
+  kuota      Int      @default(1)
+  tutupAt    DateTime?
+  terbit     Boolean  @default(true)
+  dibuatAt   DateTime @default(now())
+  diubahAt   DateTime @updatedAt
+
+  lamaran    Lamaran[]
+
+  @@map("lowongan")
+}
+
+model Lamaran {
+  id          String   @id @default(cuid())
+  lowonganId  String?
+  lowongan    Lowongan? @relation(fields: [lowonganId], references: [id], onDelete: SetNull)
+  nama        String
+  email       String
+  telepon     String
+  domisili    String
+  pendidikan  String?
+  pengalaman  String?
+  berkas      String?
+  catatan     String?
+  status      String   @default("BARU")
+  dibuatAt    DateTime @default(now())
+
+  @@index([status])
+  @@map("lamaran")
+}
+
+model Pesan {
+  id         String   @id @default(cuid())
+  nama       String
+  email      String
+  telepon    String
+  perusahaan String?
+  layanan    String?
+  lokasi     String?
+  kebutuhan  String?
+  pesan      String
+  status     String   @default("BARU")
+  ip         String?
+  dibuatAt   DateTime @default(now())
+
+  @@index([status])
+  @@map("pesan")
+}
+
+model Testimoni {
+  id       String   @id @default(cuid())
+  nama     String
+  jabatan  String
+  instansi String
+  isi      String
+  foto     String?
+  rating   Int      @default(5)
+  urutan   Int      @default(0)
+  terbit   Boolean  @default(true)
+  dibuatAt DateTime @default(now())
+
+  @@map("testimoni")
+}
+
+model Faq {
+  id       String   @id @default(cuid())
+  tanya    String
+  jawab    String
+  kategori String   @default("Umum")
+  urutan   Int      @default(0)
+  terbit   Boolean  @default(true)
+
+  @@map("faq")
+}
+
+model Pengaturan {
+  kunci    String   @id
+  nilai    Json
+  diubahAt DateTime @updatedAt
+
+  @@map("pengaturan")
+}
+
+model Berkas {
+  id        String   @id @default(cuid())
+  namaAsli  String
+  objek     String   @unique
+  url       String
+  mime      String
+  ukuran    Int
+  folder    String   @default("umum")
+  dibuatAt  DateTime @default(now())
+
+  @@map("berkas")
+}

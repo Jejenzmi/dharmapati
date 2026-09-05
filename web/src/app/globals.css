@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #0a1440;
+  --navy-tua: #050c28;
+  --emas: #f5b301;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-white text-slate-700 antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04';
+  }
+  h1, h2, h3, h4 { @apply font-judul text-navy-900; text-wrap: balance; }
+  ::selection { background: var(--emas); color: var(--navy-tua); }
+}
+
+@layer components {
+  .wadah { @apply mx-auto w-full max-w-7xl px-5 sm:px-8; }
+
+  .tombol-utama {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-emas-500 px-6 py-3
+           text-sm font-bold uppercase tracking-wide text-navy-950 shadow-lg shadow-emas-500/25
+           transition hover:-translate-y-0.5 hover:bg-emas-400 hover:shadow-xl hover:shadow-emas-500/30
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emas-500;
+  }
+  .tombol-garis {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/30 px-6 py-3
+           text-sm font-bold uppercase tracking-wide text-white transition
+           hover:border-emas-400 hover:text-emas-300;
+  }
+  .tombol-navy {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-navy-900 px-6 py-3
+           text-sm font-bold uppercase tracking-wide text-white transition hover:bg-navy-800;
+  }
+
+  .label-bagian {
+    @apply inline-flex items-center gap-2 rounded-full bg-emas-500/10 px-4 py-1.5
+           text-xs font-bold uppercase tracking-[0.18em] text-emas-700;
+  }
+  .label-bagian-gelap {
+    @apply inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5
+           text-xs font-bold uppercase tracking-[0.18em] text-emas-300 ring-1 ring-white/15;
+  }
+
+  .kartu {
+    @apply rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition
+           hover:-translate-y-1 hover:border-emas-300 hover:shadow-xl hover:shadow-navy-900/5;
+  }
+
+  .prosa {
+    @apply text-[15px] leading-[1.85] text-slate-600;
+  }
+  .prosa h2 { @apply mb-3 mt-10 text-xl font-bold text-navy-900 sm:text-2xl; }
+  .prosa h3 { @apply mb-2 mt-8 text-lg font-bold text-navy-900; }
+  .prosa p { @apply mb-4; }
+  .prosa ul { @apply mb-4 list-disc space-y-2 pl-5; }
+  .prosa ol { @apply mb-4 list-decimal space-y-2 pl-5; }
+  .prosa strong { @apply font-semibold text-navy-900; }
+  .prosa a { @apply font-medium text-navy-700 underline decoration-emas-400 decoration-2 underline-offset-2; }
+}
+
+/* Leaflet: sesuaikan warna kendali & popup dengan tema situs */
+.leaflet-container { font-family: inherit; background: #eef2f7; }
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  box-shadow: 0 18px 40px -12px rgba(10, 20, 64, 0.4);
+  border: 1px solid rgba(10, 20, 64, 0.08);
+}
+.leaflet-popup-content { margin: 14px 16px; font-size: 13px; line-height: 1.55; }
+.leaflet-popup-tip { box-shadow: none; }
+.leaflet-control-zoom a {
+  border-radius: 10px !important;
+  color: #0a1440 !important;
+  font-weight: 700;
+}
+.leaflet-bar { border: none !important; box-shadow: 0 6px 18px -6px rgba(10,20,64,.35) !important; }
+.penanda-dharmapati { background: none; border: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
