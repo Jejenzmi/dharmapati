@@ -43,6 +43,22 @@ export const metadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'id_ID',
+    siteName: NAMA_SITUS,
+    url: ASAL_SITUS,
+    title: 'PT. Dharmapati Putra Nusantara — Jasa Pengamanan, Cleaning Service & Tenaga Kerja',
+    description:
+      'Perusahaan jasa pengamanan (Satpam), cleaning service, dan penyediaan tenaga kerja berizin SIO Polri, ABUJAPI, dan APKLINDO.',
+    images: [{ url: '/merek/og.png', width: 1200, height: 630, alt: NAMA_SITUS }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PT. Dharmapati Putra Nusantara',
+    description: 'Jasa pengamanan, cleaning service, dan penyediaan tenaga kerja berizin.',
+    images: ['/merek/og.png'],
+  },
   robots: {
     index: true,
     follow: true,

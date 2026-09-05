@@ -4,10 +4,26 @@ import { ambil, PENGATURAN_CADANGAN, type DataBeranda } from '@/lib/api'
 import { FOTO } from '@/lib/foto'
 import { NAMA_LINI, tanggalId } from '@/lib/format'
 import { AjakanBertindak, JudulBagian, Statistik } from '@/komponen/bagian'
+import { buatMetadata } from '@/lib/seo'
 import { Berkas, Centang, IkonLayanan, Panah, Perisai, Peta, Titik, TopiWisuda } from '@/komponen/ikon'
 import PetaKlien from '@/komponen/PetaKlien'
 
 export const revalidate = 300
+
+export const metadata = buatMetadata({
+  judul: 'PT. Dharmapati Putra Nusantara — Jasa Pengamanan, Cleaning Service & Tenaga Kerja',
+  deskripsi:
+    'Perusahaan jasa pengamanan (Satpam), cleaning service, dan penyediaan tenaga kerja berizin SIO Polri, ABUJAPI, dan APKLINDO. Melayani industri, perkantoran, dan instansi pemerintah di Purwakarta, Karawang, Subang, Bekasi, Jakarta, hingga Jawa Timur.',
+  jalur: '/',
+  kataKunci: [
+    'jasa keamanan purwakarta',
+    'outsourcing satpam karawang',
+    'perusahaan cleaning service purwakarta',
+    'penyedia tenaga kerja subang',
+    'jasa satpam bersertifikat abujapi',
+    'security service jawa barat',
+  ],
+})
 
 const PILAR = [
   {
