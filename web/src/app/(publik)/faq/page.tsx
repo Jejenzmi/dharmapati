@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ambil, type Faq } from '@/lib/api'
+import { ambil, ambilPengaturan, type Faq } from '@/lib/api'
 import { buatMetadata, DataTerstruktur, ldFaq, ldRemah } from '@/lib/seo'
 import { AjakanBertindak, KepalaHalaman } from '@/komponen/bagian'
 import { Panah } from '@/komponen/ikon'
@@ -17,7 +17,9 @@ export const metadata = buatMetadata({
 const REMAH = [{ nama: 'Beranda', jalur: '/' }, { nama: 'Tanya Jawab', jalur: '/faq' }]
 
 export default async function HalamanFaq() {
-  const daftar = (await ambil<Faq[]>('/faq')) ?? []
+  const [isi, pengaturan] = await Promise.all([ambil<Faq[]>('/faq'), ambilPengaturan()])
+  const daftar = isi ?? []
+  const surelDukungan = pengaturan.kontak?.emailDukungan ?? pengaturan.kontak?.email
   const kategori = Array.from(new Set(daftar.map((f) => f.kategori)))
 
   return (
@@ -63,7 +65,9 @@ export default async function HalamanFaq() {
           <div className="mt-12 rounded-3xl bg-slate-50 p-8 text-center">
             <h2 className="text-xl font-bold">Masih ada yang ingin ditanyakan?</h2>
             <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-slate-600">
-              Kirim pertanyaan Anda melalui formulir kontak, atau langsung hubungi kantor kami di Purwakarta.
+              Kirim pertanyaan Anda melalui formulir kontak, surelkan ke{' '}
+              <a href={`mailto:${surelDukungan}`} className="font-semibold text-navy-800 underline decoration-emas-400 decoration-2 underline-offset-2">{surelDukungan}</a>
+              , atau langsung hubungi kantor kami di Purwakarta.
             </p>
             <Link href="/kontak" className="tombol-utama mt-6">Hubungi Kami <Panah className="h-4 w-4" /></Link>
           </div>

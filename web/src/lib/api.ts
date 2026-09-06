@@ -83,7 +83,8 @@ export type Pengaturan = {
   }
   kontak?: {
     alamatKantor: string; alamatCabang: string; alamatPusdiklat: string
-    email: string; telepon: string[]; whatsapp: string; jamKerja: string
+    email: string; emailKarier?: string; emailBisnis?: string; emailDukungan?: string
+    telepon: string[]; whatsapp: string; jamKerja: string
     petaKantor: { lat: number; lng: number }
     petaCabang: { lat: number; lng: number }
     petaPusdiklat: { lat: number; lng: number }
@@ -145,7 +146,10 @@ export const PENGATURAN_CADANGAN: Pengaturan = {
     alamatKantor: 'Samesta Royal Campaka, Ruko Blok R1 No. 36, Campaka, Purwakarta, Jawa Barat 41181',
     alamatCabang: 'Jl. Raya Pegangsaan Dua H. Oyar No. 3, Kelapa Gading, Jakarta Utara 14250',
     alamatPusdiklat: 'Jl. Raya Gantar – Sanca, Blok Tanjungsari 1, Mekarjaya, Kec. Gantar, Kab. Indramayu',
-    email: 'dharmapati02@gmail.com',
+    email: 'info@dharmapati.co.id',
+    emailKarier: 'career@dharmapati.co.id',
+    emailBisnis: 'business@dharmapati.co.id',
+    emailDukungan: 'support@dharmapati.co.id',
     telepon: ['087777889158', '081288931154', '089648278879'],
     whatsapp: '6287777889158',
     jamKerja: 'Senin – Jumat, 08.00 – 17.00 WIB',

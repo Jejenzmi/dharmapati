@@ -60,7 +60,12 @@ export default async function HalamanKontak() {
                 </li>
                 <li className="flex gap-3">
                   <Amplop className="mt-0.5 h-4 w-4 shrink-0 text-emas-400" />
-                  <a href={`mailto:${k.email}`} className="text-slate-300 transition hover:text-white">{k.email}</a>
+                  <span className="flex flex-col gap-0.5">
+                    <a href={`mailto:${k.email}`} className="text-slate-300 transition hover:text-white">{k.email}</a>
+                    {k.emailBisnis && k.emailBisnis !== k.email && (
+                      <a href={`mailto:${k.emailBisnis}`} className="text-slate-300 transition hover:text-white">{k.emailBisnis}</a>
+                    )}
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <Jam className="mt-0.5 h-4 w-4 shrink-0 text-emas-400" />

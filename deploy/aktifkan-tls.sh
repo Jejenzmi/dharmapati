@@ -3,7 +3,7 @@
 set -euo pipefail
 
 DOMAIN="${DOMAIN:-dharmapati.co.id}"
-SUREL="${SUREL:-dharmapati02@gmail.com}"
+SUREL="${SUREL:-admin@dharmapati.co.id}"
 
 echo "› Memastikan DNS mengarah ke server ini"
 IP_SERVER="$(curl -4 -fsS --max-time 10 https://ifconfig.me || hostname -I | awk '{print $1}')"

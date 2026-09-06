@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ambil, type Lowongan } from '@/lib/api'
+import { ambil, ambilPengaturan, type Lowongan } from '@/lib/api'
 import { FOTO } from '@/lib/foto'
 import { tanggalId } from '@/lib/format'
 import { MENU } from '@/lib/navigasi'
@@ -22,7 +22,9 @@ const REMAH = [{ nama: 'Beranda', jalur: '/' }, { nama: 'Karier', jalur: '/karie
 const SAUDARA = MENU.find((m) => m.label === 'Karier')!.anak!
 
 export default async function LowonganTerbuka() {
-  const daftar = (await ambil<Lowongan[]>('/lowongan')) ?? []
+  const [lowongan, pengaturan] = await Promise.all([ambil<Lowongan[]>('/lowongan'), ambilPengaturan()])
+  const daftar = lowongan ?? []
+  const surelKarier = pengaturan.kontak?.emailKarier ?? pengaturan.kontak?.email
 
   return (
     <>
@@ -72,12 +74,26 @@ export default async function LowonganTerbuka() {
             </p>
           )}
 
-          <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-6">
-            <h2 className="text-sm font-bold text-amber-900">Perhatian</h2>
-            <p className="mt-1.5 text-sm leading-relaxed text-amber-800">
-              Seluruh proses rekrutmen Dharmapati <strong>tidak dipungut biaya</strong>. Kami tidak pernah
-              meminta transfer uang untuk seragam, pelatihan, atau penempatan.
-            </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
+              <h2 className="text-sm font-bold text-amber-900">Perhatian</h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-amber-800">
+                Seluruh proses rekrutmen Dharmapati <strong>tidak dipungut biaya</strong>. Kami tidak pernah
+                meminta transfer uang untuk seragam, pelatihan, atau penempatan.
+              </p>
+            </div>
+            {surelKarier && (
+              <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                <h2 className="text-sm font-bold text-navy-900">Bertanya soal lowongan?</h2>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">
+                  Surelkan pertanyaan Anda ke{' '}
+                  <a href={`mailto:${surelKarier}`} className="font-semibold text-navy-800 underline decoration-emas-400 decoration-2 underline-offset-2">
+                    {surelKarier}
+                  </a>
+                  . Berkas lamaran tetap kami terima lewat formulir daring.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
