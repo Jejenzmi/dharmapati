@@ -49,6 +49,7 @@ export type Sumber = {
   kunci: string
   label: string
   ikon: string
+  kelompok: 'Masuk' | 'Konten' | 'Profil'
   bidang: Bidang[]
   bacaSaja?: boolean
 }
@@ -57,7 +58,7 @@ const LINI = ['KEAMANAN', 'KEBERSIHAN', 'TENAGA_KERJA', 'PENDUKUNG']
 
 export const SUMBER: Sumber[] = [
   {
-    kunci: 'pesan', label: 'Pesan Masuk', ikon: '✉️', bacaSaja: true,
+    kunci: 'pesan', kelompok: 'Masuk', label: 'Pesan Masuk', ikon: '✉️', bacaSaja: true,
     bidang: [
       { nama: 'nama', label: 'Nama', jenis: 'teks', diTabel: true },
       { nama: 'perusahaan', label: 'Perusahaan', jenis: 'teks', diTabel: true },
@@ -71,7 +72,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'lamaran', label: 'Lamaran Kerja', ikon: '📄', bacaSaja: true,
+    kunci: 'lamaran', kelompok: 'Masuk', label: 'Lamaran Kerja', ikon: '📄', bacaSaja: true,
     bidang: [
       { nama: 'nama', label: 'Nama', jenis: 'teks', diTabel: true },
       { nama: 'email', label: 'Surel', jenis: 'teks', diTabel: true },
@@ -85,7 +86,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'klien', label: 'Klien & Peta', ikon: '📍',
+    kunci: 'klien', kelompok: 'Konten', label: 'Klien & Peta', ikon: '📍',
     bidang: [
       { nama: 'nama', label: 'Nama klien', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'slug', label: 'Slug', jenis: 'teks', wajib: true, bantuan: 'Unik, huruf kecil dan tanda hubung' },
@@ -102,7 +103,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'layanan', label: 'Layanan', ikon: '🛡️',
+    kunci: 'layanan', kelompok: 'Konten', label: 'Layanan', ikon: '🛡️',
     bidang: [
       { nama: 'nama', label: 'Nama layanan', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'slug', label: 'Slug', jenis: 'teks', wajib: true },
@@ -121,7 +122,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'artikel', label: 'Artikel', ikon: '📰',
+    kunci: 'artikel', kelompok: 'Konten', label: 'Artikel', ikon: '📰',
     bidang: [
       { nama: 'judul', label: 'Judul', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'slug', label: 'Slug', jenis: 'teks', wajib: true },
@@ -137,7 +138,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'lowongan', label: 'Lowongan', ikon: '💼',
+    kunci: 'lowongan', kelompok: 'Konten', label: 'Lowongan', ikon: '💼',
     bidang: [
       { nama: 'posisi', label: 'Posisi', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'slug', label: 'Slug', jenis: 'teks', wajib: true },
@@ -152,7 +153,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'galeri', label: 'Galeri', ikon: '🖼️',
+    kunci: 'galeri', kelompok: 'Konten', label: 'Galeri', ikon: '🖼️',
     bidang: [
       { nama: 'judul', label: 'Judul', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'kategori', label: 'Kategori', jenis: 'teks', wajib: true, diTabel: true },
@@ -163,7 +164,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'personel', label: 'Struktur Organisasi', ikon: '👥',
+    kunci: 'personel', kelompok: 'Profil', label: 'Struktur Organisasi', ikon: '👥',
     bidang: [
       { nama: 'nama', label: 'Nama', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'jabatan', label: 'Jabatan', jenis: 'teks', wajib: true, diTabel: true },
@@ -176,7 +177,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'legalitas', label: 'Legalitas', ikon: '📜',
+    kunci: 'legalitas', kelompok: 'Profil', label: 'Legalitas', ikon: '📜',
     bidang: [
       { nama: 'label', label: 'Nama dokumen', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'nomor', label: 'Nomor', jenis: 'teks', wajib: true, diTabel: true },
@@ -187,7 +188,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'kbli', label: 'KBLI', ikon: '🏷️',
+    kunci: 'kbli', kelompok: 'Profil', label: 'KBLI', ikon: '🏷️',
     bidang: [
       { nama: 'kode', label: 'Kode', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'judul', label: 'Judul', jenis: 'teks', wajib: true, diTabel: true },
@@ -196,7 +197,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'faq', label: 'Tanya Jawab', ikon: '❓',
+    kunci: 'faq', kelompok: 'Konten', label: 'Tanya Jawab', ikon: '❓',
     bidang: [
       { nama: 'tanya', label: 'Pertanyaan', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'jawab', label: 'Jawaban', jenis: 'panjang', wajib: true },
@@ -206,7 +207,7 @@ export const SUMBER: Sumber[] = [
     ],
   },
   {
-    kunci: 'testimoni', label: 'Testimoni', ikon: '💬',
+    kunci: 'testimoni', kelompok: 'Konten', label: 'Testimoni', ikon: '💬',
     bidang: [
       { nama: 'nama', label: 'Nama', jenis: 'teks', wajib: true, diTabel: true },
       { nama: 'jabatan', label: 'Jabatan', jenis: 'teks', wajib: true, diTabel: true },

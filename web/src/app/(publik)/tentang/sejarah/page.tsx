@@ -43,7 +43,7 @@ export default async function Sejarah() {
             <JudulBagian label="Filosofi" judul="Kesetiaan sebagai dasar pengabdian" />
             <div className="prosa">
               <p>{s?.filosofi}</p>
-              <p className="rounded-2xl border-l-4 border-emas-500 bg-emas-50/60 px-6 py-5 font-judul text-lg font-bold text-navy-900">
+              <p className="tanpa-rata rounded-2xl border-l-4 border-emas-500 bg-emas-50/60 px-6 py-5 font-judul text-lg font-bold text-navy-900">
                 {s?.arti}
               </p>
               <p>{s?.hubunganInduk}</p>

@@ -63,6 +63,30 @@
   .prosa a { @apply font-medium text-navy-700 underline decoration-emas-400 decoration-2 underline-offset-2; }
 }
 
+/*
+ * Perataan kanan-kiri untuk teks naratif halaman publik.
+ * Sasarannya paragraf bertubuh panjang (.prosa dan paragraf ber-leading-relaxed);
+ * apa pun yang berada di dalam blok rata tengah sengaja dikecualikan.
+ */
+.isi-publik :where(.prosa p, .prosa li):not(.text-center *),
+.isi-publik p[class~="leading-relaxed"]:not(.text-center *):not([class*="text-center"]) {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  hyphenate-limit-chars: 7 4 3;
+}
+
+@supports (text-wrap: pretty) {
+  .isi-publik :where(.prosa p, .prosa li) { text-wrap: pretty; }
+}
+
+/* Pengecualian manual bila suatu paragraf tetap ingin rata kiri. */
+.isi-publik .tanpa-rata,
+.isi-publik .tanpa-rata p {
+  text-align: left;
+  hyphens: manual;
+}
+
 /* Leaflet: sesuaikan warna kendali & popup dengan tema situs */
 .leaflet-container { font-family: inherit; background: #eef2f7; }
 .leaflet-popup-content-wrapper {

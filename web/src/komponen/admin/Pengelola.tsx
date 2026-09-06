@@ -1,11 +1,20 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { apiAdmin, type Bidang, type Sumber } from '@/lib/admin'
-import { API_PERAMBAN } from '@/lib/api'
-import { Silang } from '../ikon'
+import { Panah, Silang } from '../ikon'
 
 type Baris = Record<string, any>
+
+const WARNA_STATUS: Record<string, string> = {
+  BARU: 'bg-blue-100 text-blue-800',
+  DIPROSES: 'bg-orange-100 text-orange-800',
+  SELEKSI: 'bg-orange-100 text-orange-800',
+  SELESAI: 'bg-emerald-100 text-emerald-800',
+  DITERIMA: 'bg-emerald-100 text-emerald-800',
+  BATAL: 'bg-slate-100 text-slate-600',
+  DITOLAK: 'bg-slate-100 text-slate-600',
+}
 
 export default function Pengelola({ sumber }: { sumber: Sumber }) {
   const [data, setData] = useState<Baris[]>([])
@@ -28,12 +37,13 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
   useEffect(() => { ambilData() }, [ambilData])
 
   const kolom = sumber.bidang.filter((b) => b.diTabel).slice(0, 5)
-  const tersaring = cari
-    ? data.filter((d) => JSON.stringify(d).toLowerCase().includes(cari.toLowerCase()))
-    : data
+  const tersaring = useMemo(
+    () => (cari ? data.filter((d) => JSON.stringify(d).toLowerCase().includes(cari.toLowerCase())) : data),
+    [data, cari],
+  )
 
   async function hapus(baris: Baris) {
-    if (!confirm(`Hapus data ini? Tindakan tidak dapat dibatalkan.`)) return
+    if (!confirm('Hapus data ini? Tindakan tidak dapat dibatalkan.')) return
     try {
       await apiAdmin(`/admin/data/${sumber.kunci}/${baris.id}`, { method: 'DELETE' })
       await ambilData()
@@ -44,17 +54,31 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold">{sumber.label}</h1>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{data.length}</span>
-        <input
-          value={cari}
-          onChange={(e) => setCari(e.target.value)}
-          placeholder="Cari…"
-          className="ml-auto w-56 rounded-xl border border-slate-200 px-4 py-2 text-sm outline-none focus:border-emas-500"
-        />
+      {/* Bilah alat */}
+      <div className="mb-5 flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+        <span aria-hidden="true" className="text-xl">{sumber.ikon}</span>
+        <span>
+          <span className="block text-sm font-bold text-navy-900">{sumber.label}</span>
+          <span className="block text-[11px] text-slate-500">
+            {muat ? 'memuat…' : `${data.length} baris${sumber.bacaSaja ? ' · hanya baca' : ''}`}
+          </span>
+        </span>
+
+        <span className="relative ml-auto">
+          <input
+            value={cari}
+            onChange={(e) => setCari(e.target.value)}
+            placeholder="Cari…"
+            aria-label={`Cari ${sumber.label}`}
+            className="w-44 rounded-xl border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none transition focus:border-emas-500 focus:ring-4 focus:ring-emas-500/10 sm:w-60"
+          />
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" strokeLinecap="round" />
+          </svg>
+        </span>
+
         {!sumber.bacaSaja && (
-          <button type="button" onClick={() => setSunting({})} className="rounded-xl bg-navy-950 px-4 py-2 text-sm font-bold text-white transition hover:bg-navy-800">
+          <button type="button" onClick={() => setSunting({})} className="rounded-xl bg-navy-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-navy-800">
             + Tambah
           </button>
         )}
@@ -64,29 +88,61 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
 
       <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+          <thead className="border-b border-slate-200 bg-slate-50 text-[11px] uppercase tracking-wide text-slate-500">
             <tr>
-              {kolom.map((k) => <th key={k.nama} scope="col" className="px-4 py-3 font-bold">{k.label}</th>)}
-              <th scope="col" className="px-4 py-3 text-right font-bold">Aksi</th>
+              {kolom.map((k) => <th key={k.nama} scope="col" className="px-5 py-3.5 font-bold">{k.label}</th>)}
+              <th scope="col" className="px-5 py-3.5 text-right font-bold">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {muat && <tr><td colSpan={kolom.length + 1} className="px-4 py-10 text-center text-slate-400">Memuat…</td></tr>}
-            {!muat && !tersaring.length && <tr><td colSpan={kolom.length + 1} className="px-4 py-10 text-center text-slate-400">Belum ada data.</td></tr>}
-            {tersaring.map((b) => (
-              <tr key={b.id} className="transition hover:bg-slate-50">
+            {muat && Array.from({ length: 4 }).map((_, i) => (
+              <tr key={i}>
+                {kolom.map((k) => <td key={k.nama} className="px-5 py-4"><span className="block h-3 w-24 animate-pulse rounded bg-slate-100" /></td>)}
+                <td className="px-5 py-4"><span className="ml-auto block h-3 w-14 animate-pulse rounded bg-slate-100" /></td>
+              </tr>
+            ))}
+
+            {!muat && !tersaring.length && (
+              <tr>
+                <td colSpan={kolom.length + 1} className="px-5 py-16 text-center">
+                  <p className="text-3xl" aria-hidden="true">{sumber.ikon}</p>
+                  <p className="mt-3 text-sm font-semibold text-slate-600">
+                    {cari ? 'Tidak ada yang cocok dengan pencarian' : `Belum ada ${sumber.label.toLowerCase()}`}
+                  </p>
+                  {cari
+                    ? <button type="button" onClick={() => setCari('')} className="mt-3 text-xs font-bold text-navy-700 hover:text-emas-600">Hapus pencarian</button>
+                    : !sumber.bacaSaja && (
+                      <button type="button" onClick={() => setSunting({})} className="mt-4 rounded-xl bg-navy-950 px-4 py-2 text-xs font-bold text-white">
+                        + Tambah data pertama
+                      </button>
+                    )}
+                </td>
+              </tr>
+            )}
+
+            {!muat && tersaring.map((b) => (
+              <tr key={b.id} className="transition hover:bg-slate-50/70">
                 {kolom.map((k) => (
-                  <td key={k.nama} className="max-w-[240px] truncate px-4 py-3 text-slate-700">
-                    {k.jenis === 'saklar'
-                      ? <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${b[k.nama] ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>{b[k.nama] ? 'Ya' : 'Tidak'}</span>
-                      : String(b[k.nama] ?? '—')}
+                  <td key={k.nama} className="max-w-[260px] px-5 py-3.5 text-slate-700">
+                    {k.jenis === 'saklar' ? (
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${b[k.nama] ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                        <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${b[k.nama] ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+                        {b[k.nama] ? 'Aktif' : 'Nonaktif'}
+                      </span>
+                    ) : k.nama === 'status' ? (
+                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${WARNA_STATUS[b[k.nama]] ?? 'bg-slate-100 text-slate-600'}`}>
+                        {b[k.nama]}
+                      </span>
+                    ) : (
+                      <span className="block truncate">{String(b[k.nama] ?? '—')}</span>
+                    )}
                   </td>
                 ))}
-                <td className="whitespace-nowrap px-4 py-3 text-right">
-                  <button type="button" onClick={() => setSunting(b)} className="rounded-lg px-3 py-1.5 text-xs font-bold text-navy-800 hover:bg-slate-100">
+                <td className="whitespace-nowrap px-5 py-3.5 text-right">
+                  <button type="button" onClick={() => setSunting(b)} className="rounded-lg px-3 py-1.5 text-xs font-bold text-navy-800 transition hover:bg-slate-100">
                     {sumber.bacaSaja ? 'Lihat' : 'Ubah'}
                   </button>
-                  <button type="button" onClick={() => hapus(b)} className="rounded-lg px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50">Hapus</button>
+                  <button type="button" onClick={() => hapus(b)} className="rounded-lg px-3 py-1.5 text-xs font-bold text-rose-600 transition hover:bg-rose-50">Hapus</button>
                 </td>
               </tr>
             ))}
@@ -118,6 +174,13 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
   const [galat, setGalat] = useState('')
   const baru = !awal.id
 
+  useEffect(() => {
+    const tombol = (e: KeyboardEvent) => { if (e.key === 'Escape') tutup() }
+    window.addEventListener('keydown', tombol)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', tombol); document.body.style.overflow = '' }
+  }, [tutup])
+
   async function kirim(e: React.FormEvent) {
     e.preventDefault()
     setSimpan(true); setGalat('')
@@ -143,42 +206,46 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
   }
 
   return (
-    <div className="fixed inset-0 z-[960] flex items-start justify-center overflow-y-auto bg-navy-950/60 p-4 backdrop-blur-sm" onClick={tutup}>
+    <div className="fixed inset-0 z-[960] flex justify-end bg-navy-950/50 backdrop-blur-sm" onClick={tutup}>
       <form
         onSubmit={kirim}
         onClick={(e) => e.stopPropagation()}
-        className="my-8 w-full max-w-2xl rounded-3xl bg-white p-7 shadow-2xl"
+        className="flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl"
       >
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-bold">{baru ? `Tambah ${sumber.label}` : `Ubah ${sumber.label}`}</h2>
-          <button type="button" onClick={tutup} aria-label="Tutup" className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"><Silang className="h-5 w-5" /></button>
-        </div>
+        <header className="flex items-center justify-between border-b border-slate-200 px-7 py-5">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{sumber.label}</p>
+            <h2 className="font-judul text-xl font-bold text-navy-900">{baru ? 'Tambah data' : 'Ubah data'}</h2>
+          </div>
+          <button type="button" onClick={tutup} aria-label="Tutup" className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-navy-900">
+            <Silang className="h-5 w-5" />
+          </button>
+        </header>
 
-        <div className="space-y-4">
+        <div className="flex-1 space-y-4 overflow-y-auto px-7 py-6">
           {sumber.bidang.map((b) => (
             <Isian key={b.nama} bidang={b} nilai={nilai[b.nama]} ubah={(v) => setNilai((n) => ({ ...n, [b.nama]: v }))} />
           ))}
+          {galat && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{galat}</p>}
         </div>
 
-        {galat && <p className="mt-4 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{galat}</p>}
-
-        <div className="mt-7 flex gap-3">
-          <button type="submit" disabled={simpan} className="rounded-xl bg-emas-500 px-6 py-2.5 text-sm font-bold text-navy-950 transition hover:bg-emas-400 disabled:opacity-60">
-            {simpan ? 'Menyimpan…' : 'Simpan'}
+        <footer className="flex items-center gap-3 border-t border-slate-200 px-7 py-5">
+          <button type="submit" disabled={simpan} className="inline-flex items-center gap-2 rounded-xl bg-emas-500 px-6 py-2.5 text-sm font-bold text-navy-950 transition hover:bg-emas-400 disabled:opacity-60">
+            {simpan ? 'Menyimpan…' : <>Simpan <Panah className="h-4 w-4" /></>}
           </button>
-          <button type="button" onClick={tutup} className="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50">Batal</button>
-        </div>
+          <button type="button" onClick={tutup} className="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Batal</button>
+        </footer>
       </form>
     </div>
   )
 }
 
-function Isian({ bidang, nilai, ubah }: { bidang: Bidang; nilai: any; ubah: (v: any) => void }) {
-  const kelas = 'w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emas-500 focus:ring-4 focus:ring-emas-500/10'
+const KELAS = 'w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emas-500 focus:ring-4 focus:ring-emas-500/10'
 
+function Isian({ bidang, nilai, ubah }: { bidang: Bidang; nilai: any; ubah: (v: any) => void }) {
   if (bidang.jenis === 'saklar') {
     return (
-      <label className="flex items-center gap-3">
+      <label className="flex cursor-pointer items-center gap-3 rounded-xl bg-slate-50 px-4 py-3">
         <input type="checkbox" checked={!!nilai} onChange={(e) => ubah(e.target.checked)} className="h-4 w-4 rounded accent-emas-500" />
         <span className="text-sm font-semibold text-slate-700">{bidang.label}</span>
       </label>
@@ -192,28 +259,23 @@ function Isian({ bidang, nilai, ubah }: { bidang: Bidang; nilai: any; ubah: (v: 
       </span>
 
       {bidang.jenis === 'panjang' && (
-        <textarea rows={bidang.nama === 'isi' || bidang.nama === 'deskripsi' ? 10 : 3} value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} required={bidang.wajib} className={kelas} />
+        <textarea rows={bidang.nama === 'isi' || bidang.nama === 'deskripsi' ? 10 : 3} value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} required={bidang.wajib} className={KELAS} />
       )}
       {bidang.jenis === 'daftar' && (
-        <textarea
-          rows={5}
-          value={Array.isArray(nilai) ? nilai.join('\n') : (nilai ?? '')}
-          onChange={(e) => ubah(e.target.value.split('\n'))}
-          className={kelas}
-        />
+        <textarea rows={5} value={Array.isArray(nilai) ? nilai.join('\n') : (nilai ?? '')} onChange={(e) => ubah(e.target.value.split('\n'))} className={KELAS} />
       )}
       {bidang.jenis === 'pilih' && (
-        <select value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} className={kelas}>
+        <select value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} className={KELAS}>
           <option value="">—</option>
           {bidang.pilihan?.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
       )}
       {bidang.jenis === 'angka' && (
-        <input type="number" step="any" value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} required={bidang.wajib} className={kelas} />
+        <input type="number" step="any" value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} required={bidang.wajib} className={KELAS} />
       )}
-      {bidang.jenis === 'gambar' && <PilihGambar nilai={nilai} ubah={ubah} kelas={kelas} />}
+      {bidang.jenis === 'gambar' && <PilihGambar nilai={nilai} ubah={ubah} />}
       {bidang.jenis === 'teks' && (
-        <input type="text" value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} required={bidang.wajib} className={kelas} />
+        <input type="text" value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} required={bidang.wajib} className={KELAS} />
       )}
 
       {bidang.bantuan && <span className="mt-1 block text-xs text-slate-400">{bidang.bantuan}</span>}
@@ -221,7 +283,7 @@ function Isian({ bidang, nilai, ubah }: { bidang: Bidang; nilai: any; ubah: (v: 
   )
 }
 
-function PilihGambar({ nilai, ubah, kelas }: { nilai: any; ubah: (v: any) => void; kelas: string }) {
+function PilihGambar({ nilai, ubah }: { nilai: any; ubah: (v: any) => void }) {
   const [naik, setNaik] = useState(false)
 
   async function unggah(berkas: File) {
@@ -241,8 +303,8 @@ function PilihGambar({ nilai, ubah, kelas }: { nilai: any; ubah: (v: any) => voi
 
   return (
     <div className="space-y-2">
-      <input type="text" value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} placeholder="URL gambar atau unggah berkas" className={kelas} />
-      <div className="flex items-center gap-3">
+      <input type="text" value={nilai ?? ''} onChange={(e) => ubah(e.target.value)} placeholder="URL gambar atau unggah berkas" className={KELAS} />
+      <div className="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
         <input
           type="file"
           accept="image/*"
@@ -252,10 +314,9 @@ function PilihGambar({ nilai, ubah, kelas }: { nilai: any; ubah: (v: any) => voi
         {naik && <span className="text-xs text-slate-400">Mengunggah…</span>}
         {nilai && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={nilai} alt="Pratinjau" className="h-12 w-12 rounded-lg object-cover ring-1 ring-slate-200" />
+          <img src={nilai} alt="Pratinjau" className="ml-auto h-12 w-12 rounded-lg object-cover ring-1 ring-slate-200" />
         )}
       </div>
-      <p className="text-[11px] text-slate-400">Berkas disimpan di MinIO ({API_PERAMBAN.replace(/^https?:\/\//, '')}).</p>
     </div>
   )
 }

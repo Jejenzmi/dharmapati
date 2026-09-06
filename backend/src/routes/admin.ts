@@ -2,7 +2,7 @@ import { Router } from 'express'
 import multer from 'multer'
 import { prisma } from '../lib/prisma.js'
 import { wajibMasuk } from '../lib/auth.js'
-import { bersihkanSinggahan } from '../lib/redis.js'
+import { bersihkanSinggahan, redisSiap } from '../lib/redis.js'
 import { unggahBerkas } from '../lib/minio.js'
 
 export const admin = Router()
@@ -31,16 +31,55 @@ function ambilSumber(nama: string) {
 }
 
 admin.get('/ringkasan', async (_req, res) => {
-  const [klien, layanan, artikel, pesanBaru, lamaranBaru, galeri] = await Promise.all([
+  const awalBulan = new Date()
+  awalBulan.setDate(1)
+  awalBulan.setHours(0, 0, 0, 0)
+
+  const [
+    klien, layanan, artikel, galeri, lowongan, testimoni,
+    pesanBaru, lamaranBaru, pesanTotal, lamaranTotal, pesanBulanIni,
+    statusPesan, statusLamaran, klienProvinsi, klienLini,
+    pesanTerbaru, lamaranTerbaru, artikelTeratas,
+  ] = await Promise.all([
     prisma.klien.count(),
     prisma.layanan.count(),
     prisma.artikel.count(),
+    prisma.galeri.count(),
+    prisma.lowongan.count({ where: { terbit: true } }),
+    prisma.testimoni.count(),
     prisma.pesan.count({ where: { status: 'BARU' } }),
     prisma.lamaran.count({ where: { status: 'BARU' } }),
-    prisma.galeri.count(),
+    prisma.pesan.count(),
+    prisma.lamaran.count(),
+    prisma.pesan.count({ where: { dibuatAt: { gte: awalBulan } } }),
+    prisma.pesan.groupBy({ by: ['status'], _count: { _all: true } }),
+    prisma.lamaran.groupBy({ by: ['status'], _count: { _all: true } }),
+    prisma.klien.groupBy({ by: ['provinsi'], _count: { _all: true }, where: { terbit: true } }),
+    prisma.klien.groupBy({ by: ['lini'], _count: { _all: true }, where: { terbit: true } }),
+    prisma.pesan.findMany({ orderBy: { dibuatAt: 'desc' }, take: 6 }),
+    prisma.lamaran.findMany({ orderBy: { dibuatAt: 'desc' }, take: 5 }),
+    prisma.artikel.findMany({ where: { terbit: true }, orderBy: { dilihat: 'desc' }, take: 5, select: { id: true, judul: true, slug: true, dilihat: true } }),
   ])
-  const pesanTerbaru = await prisma.pesan.findMany({ orderBy: { dibuatAt: 'desc' }, take: 5 })
-  res.json({ angka: { klien, layanan, artikel, pesanBaru, lamaranBaru, galeri }, pesanTerbaru })
+
+  const cacah = (baris: { status: string; _count: { _all: number } }[]) =>
+    baris.map((b) => ({ label: b.status, jumlah: b._count._all }))
+
+  res.json({
+    angka: {
+      klien, layanan, artikel, galeri, lowongan, testimoni,
+      pesanBaru, lamaranBaru, pesanTotal, lamaranTotal, pesanBulanIni,
+    },
+    statusPesan: cacah(statusPesan as any),
+    statusLamaran: cacah(statusLamaran as any),
+    klienProvinsi: klienProvinsi
+      .map((b) => ({ label: b.provinsi, jumlah: b._count._all }))
+      .sort((a, b) => b.jumlah - a.jumlah),
+    klienLini: klienLini.map((b) => ({ label: b.lini, jumlah: b._count._all })),
+    pesanTerbaru,
+    lamaranTerbaru,
+    artikelTeratas,
+    sistem: { db: true, redis: redisSiap(), waktu: new Date().toISOString() },
+  })
 })
 
 admin.get('/data/:sumber', async (req, res, next) => {

@@ -1,11 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Bitter, Plus_Jakarta_Sans } from 'next/font/google'
 import './globals.css'
-import Kepala from '@/komponen/Kepala'
-import Kaki from '@/komponen/Kaki'
-import TombolWa from '@/komponen/TombolWa'
-import { ambilPengaturan, ASAL_SITUS } from '@/lib/api'
-import { DataTerstruktur, ldOrganisasi, ldSitus, NAMA_SITUS } from '@/lib/seo'
+import { ASAL_SITUS } from '@/lib/api'
+import { NAMA_SITUS } from '@/lib/seo'
 
 const tubuh = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -64,7 +61,6 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
   },
-  verification: {},
 }
 
 export const viewport: Viewport = {
@@ -73,27 +69,15 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default async function TataLetakAkar({ children }: { children: React.ReactNode }) {
-  const pengaturan = await ambilPengaturan()
-  const telepon = pengaturan.kontak?.telepon?.[0] ?? '087777889158'
-  const whatsapp = pengaturan.kontak?.whatsapp ?? '6287777889158'
-
+/**
+ * Tata letak akar hanya menyiapkan dokumen dan huruf.
+ * Header serta kaki halaman publik dipasang di grup rute (publik) supaya
+ * panel admin bersih tanpa navigasi situs.
+ */
+export default function TataLetakAkar({ children }: { children: React.ReactNode }) {
   return (
     <html lang="id" className={`${tubuh.variable} ${judul.variable}`}>
-      <body className="flex min-h-screen flex-col">
-        <DataTerstruktur data={ldOrganisasi(pengaturan)} />
-        <DataTerstruktur data={ldSitus()} />
-        <a
-          href="#isi"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[999] focus:rounded-lg focus:bg-emas-500 focus:px-4 focus:py-2 focus:font-bold focus:text-navy-950"
-        >
-          Lompat ke konten utama
-        </a>
-        <Kepala telepon={telepon} whatsapp={whatsapp} />
-        <main id="isi" className="flex-1">{children}</main>
-        <Kaki pengaturan={pengaturan} />
-        <TombolWa nomor={whatsapp} />
-      </body>
+      <body className="flex min-h-screen flex-col">{children}</body>
     </html>
   )
 }
