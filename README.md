@@ -62,12 +62,32 @@ Panel admin ada di `/admin` (bawaan: `admin` / `admin123` — ganti setelah pema
 ## Penempatan (deployment)
 
 ```bash
-# Kirim sumber dan bangun ulang wadah di VPS
-./deploy/kirim.sh
+./deploy/kirim.sh            # bangun ulang API dan situs
+./deploy/kirim.sh web        # hanya situs
+./deploy/kirim.sh api        # hanya API
 
 # Setelah DNS dharmapati.co.id mengarah ke VPS, terbitkan sertifikat
 ssh root@76.13.197.249 'bash /root/dharmapati/deploy/aktifkan-tls.sh'
 ```
+
+### Mengapa skrip kirim membersihkan singgahan lebih dulu
+
+Next.js memanggang isi basis data ke dalam halaman saat prarender. Ada dua lapis
+singgahan yang bisa membuat hasil build membawa data usang:
+
+1. **Redis di sisi API** menyimpan jawaban selama 5 menit. Perubahan yang ditulis
+   langsung ke basis data (lewat `psql`, bukan panel admin) tidak membatalkannya.
+2. **Lapisan build Docker.** Bila berkas sumber tidak berubah, Docker memakai
+   lapisan lama — termasuk halaman prarender beserta datanya.
+
+`kirim.sh` menangani keduanya: membersihkan Redis sebelum membangun, lalu
+mengoper `PENANDA_BANGUN` berisi cap waktu sehingga langkah `npm run build`
+selalu dijalankan ulang. Tahap `npm ci` tetap tersinggah, jadi pembangunan tidak
+menjadi lambat.
+
+Perubahan lewat panel admin tidak memerlukan pembangunan ulang: panel sudah
+membersihkan singgahan Redis sendiri, dan halaman menyegar sendiri dalam waktu
+paling lama 5 menit lewat ISR.
 
 Salin `deploy/.env.contoh` menjadi `deploy/.env` di server dan isi kata sandi
 basis data, MinIO, JWT, serta akun admin sebelum menjalankan `docker compose`.

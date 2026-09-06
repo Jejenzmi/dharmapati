@@ -16,7 +16,14 @@ ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
     NEXT_TELEMETRY_DISABLED=1
 COPY --from=pemasangan /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+
+# Next.js memanggang isi basis data ke dalam halaman saat prarender. Perubahan yang
+# hanya ada di basis data tidak mengubah berkas sumber, sehingga Docker akan memakai
+# lapisan lama dan halaman ikut usang. Nilai PENANDA_BANGUN diisi cap waktu oleh
+# skrip kirim, membuat langkah ini selalu dijalankan ulang — sementara `npm ci` di
+# tahap sebelumnya tetap tersinggah.
+ARG PENANDA_BANGUN=tetap
+RUN echo "penanda: $PENANDA_BANGUN" > /tmp/penanda && npm run build
 
 FROM dasar AS jalan
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
