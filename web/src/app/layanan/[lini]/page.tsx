@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound, permanentRedirect } from 'next/navigation'
-import { ambil, type Layanan } from '@/lib/api'
+import { ambil, ambilPengaturan, type Layanan } from '@/lib/api'
 import { FOTO } from '@/lib/foto'
 import { LINI_LAYANAN, liniDariSlug, slugDariLini } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah, mutlak } from '@/lib/seo'
@@ -9,53 +9,6 @@ import { AjakanBertindak, JudulBagian, KepalaHalaman } from '@/komponen/bagian'
 import { Centang, IkonLayanan, Panah } from '@/komponen/ikon'
 
 export const revalidate = 600
-
-const RINCI: Record<string, { intro: string; foto: string; poin: { j: string; i: string }[] }> = {
-  KEAMANAN: {
-    intro:
-      'Lini pengamanan adalah asal-usul Dharmapati. Pola kerjanya diwarisi langsung dari pengalaman pendiri kami sebagai Polisi Militer TNI AL: setiap objek dipetakan lebih dulu, dituangkan ke dalam Rencana Pengamanan, lalu diturunkan menjadi SOP yang dipegang tiap anggota di pos.',
-    foto: FOTO.apel,
-    poin: [
-      { j: 'Anggota bersertifikat', i: 'Seluruh anggota telah mengikuti pelatihan Gada Pratama dan memiliki Kartu Tanda Anggota satuan pengamanan.' },
-      { j: 'Dokumen kerja tertulis', i: 'RENPAM dan SOP disusun khusus per objek, bukan salinan dari lokasi lain.' },
-      { j: 'Pengawasan berjenjang', i: 'Danru di lokasi, supervisor yang berkunjung rutin, dan manajer operasional di kantor pusat.' },
-      { j: 'Pelaporan berkala', i: 'Buku mutasi harian, laporan kehadiran, dan rekap insiden bulanan diserahkan ke pengguna jasa.' },
-    ],
-  },
-  KEBERSIHAN: {
-    intro:
-      'Mutu kebersihan biasanya bagus di bulan pertama lalu menurun. Kami mencegahnya dengan menghitung beban kerja per zona, menyusun jadwal harian sampai bulanan yang bisa diperiksa pengguna jasa, dan menerapkan pedoman 5R sebagai kebiasaan kerja.',
-    foto: FOTO.bersihLobi,
-    poin: [
-      { j: 'Anggota APKLINDO', i: 'Terdaftar di Asosiasi Perusahaan Klining Servis Indonesia sejak 2023.' },
-      { j: 'Bahan kimia sesuai permukaan', i: 'Pemilihan chemical disesuaikan jenis lantai, kaca, dan furnitur agar tidak merusak aset.' },
-      { j: 'Ceklis area per shift', i: 'Setiap area ditandatangani petugas dan diperiksa supervisor kebersihan.' },
-      { j: 'Pengendalian hama terjadwal', i: 'Inspeksi, kartu kendali per titik umpan, dan laporan kunjungan berkala.' },
-    ],
-  },
-  TENAGA_KERJA: {
-    intro:
-      'Kami menyediakan tenaga kerja dengan alur rekrutmen yang sama ketatnya dengan penerimaan Satpam. Seluruh kewajiban ketenagakerjaan — upah, lembur, BPJS Ketenagakerjaan, dan BPJS Kesehatan — menjadi tanggung jawab kami sebagai pemberi kerja.',
-    foto: FOTO.manpowerLini,
-    poin: [
-      { j: 'Izin KBLI 78200', i: 'Aktivitas Penyediaan Tenaga Kerja Waktu Tertentu, sehingga penempatan sah secara regulasi.' },
-      { j: 'Seleksi berjenjang', i: 'Administrasi, wawancara, uji fisik, dan pemeriksaan kesehatan sebelum penempatan.' },
-      { j: 'Administrasi penuh', i: 'Absensi, penggajian, lembur, dan kepesertaan BPJS dikelola kantor pusat.' },
-      { j: 'Penggantian tenaga', i: 'Tenaga yang tidak sesuai kualifikasi diganti tanpa biaya tambahan.' },
-    ],
-  },
-  PENDUKUNG: {
-    intro:
-      'Layanan pendukung melengkapi dua lini utama agar pengelolaan fasilitas Anda tuntas dalam satu kontrak — mulai dari perawatan lanskap dan pengaturan parkir sampai pelatihan satuan pengamanan internal perusahaan.',
-    foto: FOTO.drillTongkat,
-    poin: [
-      { j: 'Pusdiklat sendiri', i: 'Pusat pendidikan dan pelatihan di Gantar, Kabupaten Indramayu.' },
-      { j: 'Materi lengkap', i: 'Dari pengetahuan dasar Polri, PBB dan PPM, bela diri, drill damkar, sampai SMK-3 dasar.' },
-      { j: 'Izin perparkiran & taman', i: 'KBLI 52215 dan 81300 untuk parkir di luar badan jalan dan perawatan taman.' },
-      { j: 'Terhubung pos jaga', i: 'Pencatatan keluar-masuk kendaraan tersambung dengan anggota di pos.' },
-    ],
-  },
-}
 
 export async function generateStaticParams() {
   return LINI_LAYANAN.map((l) => ({ lini: l.slug }))
@@ -65,9 +18,11 @@ export async function generateMetadata({ params }: { params: Promise<{ lini: str
   const { lini } = await params
   const l = liniDariSlug(lini)
   if (!l) return buatMetadata({ judul: 'Halaman tidak ditemukan', deskripsi: '', jalur: `/layanan/${lini}`, tanpaIndeks: true })
+  const pengaturan = await ambilPengaturan()
+  const intro = pengaturan.lini?.[l.kunci]?.intro ?? `Layanan ${l.label} PT. Dharmapati Putra Nusantara.`
   return buatMetadata({
     judul: `Layanan ${l.label}`,
-    deskripsi: RINCI[l.kunci].intro.slice(0, 180),
+    deskripsi: intro.slice(0, 180),
     jalur: `/layanan/${l.slug}`,
     kataKunci: [`jasa ${l.label.toLowerCase()}`, `${l.label.toLowerCase()} purwakarta`, `${l.label.toLowerCase()} karawang`],
   })
@@ -84,9 +39,9 @@ export default async function HalamanLini({ params }: { params: Promise<{ lini: 
     notFound()
   }
 
-  const semua = (await ambil<Layanan[]>('/layanan')) ?? []
-  const isi = semua.filter((x) => x.lini === info.kunci)
-  const r = RINCI[info.kunci]
+  const [semua, pengaturan] = await Promise.all([ambil<Layanan[]>('/layanan'), ambilPengaturan()])
+  const isi = (semua ?? []).filter((x) => x.lini === info.kunci)
+  const r = pengaturan.lini?.[info.kunci]
 
   const remah = [
     { nama: 'Beranda', jalur: '/' },
@@ -115,7 +70,7 @@ export default async function HalamanLini({ params }: { params: Promise<{ lini: 
         remah={remah}
         label={`Lini ${info.label}`}
         judul={`Layanan ${info.label}`}
-        deskripsi={r.intro}
+        deskripsi={r?.intro}
         anak={
           <nav aria-label="Lini lain" className="mt-8 flex flex-wrap gap-2">
             {LINI_LAYANAN.filter((x) => x.slug !== info.slug).map((x) => (
@@ -160,15 +115,15 @@ export default async function HalamanLini({ params }: { params: Promise<{ lini: 
       <section className="bg-slate-50 py-16 sm:py-20">
         <div className="wadah grid items-center gap-12 lg:grid-cols-[.85fr_1.15fr]">
           <div className="relative aspect-[4/5] overflow-hidden rounded-3xl">
-            <Image src={r.foto} alt={`Kegiatan lini ${info.label}`} fill sizes="(max-width:1024px) 80vw, 36vw" className="object-cover" />
+            <Image src={r?.gambarRinci ?? FOTO.hormat} alt={`Kegiatan lini ${info.label}`} fill sizes="(max-width:1024px) 80vw, 36vw" className="object-cover" />
           </div>
           <div>
             <JudulBagian label="Yang membedakan" judul={`Cara kami menjalankan lini ${info.label.toLowerCase()}`} />
             <div className="grid gap-4 sm:grid-cols-2">
-              {r.poin.map((p) => (
-                <div key={p.j} className="rounded-2xl border border-slate-200 bg-white p-5">
-                  <h3 className="text-sm font-bold">{p.j}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{p.i}</p>
+              {(r?.poin ?? []).map((p) => (
+                <div key={p.judul} className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <h3 className="text-sm font-bold">{p.judul}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{p.isi}</p>
                 </div>
               ))}
             </div>

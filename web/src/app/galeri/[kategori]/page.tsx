@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ambil, type Galeri as GaleriDb } from '@/lib/api'
+import { ambil, ambilPengaturan, type Galeri as GaleriDb } from '@/lib/api'
 import { KATEGORI_GALERI, kategoriGaleriDariSlug } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
 import { AjakanBertindak, KepalaHalaman } from '@/komponen/bagian'
@@ -10,17 +10,6 @@ import { BAWAAN } from '../bawaan'
 
 export const revalidate = 600
 
-const KETERANGAN: Record<string, string> = {
-  perusahaan: 'Kantor pusat, ruang kerja, dan tim administrasi yang menopang seluruh penempatan di lapangan.',
-  pengamanan: 'Anggota Satpam Dharmapati saat bertugas di pos jaga, lobi, dan area produksi pengguna jasa.',
-  supervisi: 'Kunjungan supervisor, apel pagi, dan pemeriksaan buku mutasi di objek penempatan.',
-  pelatihan: 'Kegiatan di Pusdiklat Gantar: bela diri, drill tongkat dan borgol, drill damkar, PBB, serta SMK-3 dasar.',
-  rekrutmen: 'Tahapan seleksi calon anggota, dari administrasi dan wawancara sampai upacara pelepasan.',
-  'cleaning-service': 'Pekerjaan kebersihan harian di gedung perkantoran, area produksi, toilet, dan area terbuka.',
-  pramusaji: 'Tenaga pramusaji dan pantry saat menyiapkan hidangan serta melayani tamu.',
-  manpower: 'Tenaga produksi dan operator di lini pabrik, gudang, dan gerbang kawasan industri.',
-}
-
 export async function generateStaticParams() {
   return KATEGORI_GALERI.map((k) => ({ kategori: k.slug }))
 }
@@ -29,9 +18,10 @@ export async function generateMetadata({ params }: { params: Promise<{ kategori:
   const { kategori } = await params
   const k = kategoriGaleriDariSlug(kategori)
   if (!k) return buatMetadata({ judul: 'Kategori tidak ditemukan', deskripsi: '', jalur: `/galeri/${kategori}`, tanpaIndeks: true })
+  const pengaturan = await ambilPengaturan()
   return buatMetadata({
     judul: `Galeri ${k.label}`,
-    deskripsi: KETERANGAN[k.slug] ?? `Dokumentasi kegiatan ${k.label} PT. Dharmapati Putra Nusantara.`,
+    deskripsi: pengaturan.galeriKategori?.[k.slug] ?? `Dokumentasi kegiatan ${k.label} PT. Dharmapati Putra Nusantara.`,
     jalur: `/galeri/${k.slug}`,
     kataKunci: [`foto ${k.label.toLowerCase()}`, `dokumentasi ${k.label.toLowerCase()} dharmapati`],
   })
@@ -42,7 +32,9 @@ export default async function GaleriKategori({ params }: { params: Promise<{ kat
   const info = kategoriGaleriDariSlug(kategori)
   if (!info) notFound()
 
-  const dariDb = (await ambil<GaleriDb[]>('/galeri')) ?? []
+  const [dariDbAsal, pengaturan] = await Promise.all([ambil<GaleriDb[]>('/galeri'), ambilPengaturan()])
+  const dariDb = dariDbAsal ?? []
+  const keterangan = pengaturan.galeriKategori ?? {}
   const semua: Butir[] = dariDb.length
     ? dariDb.map((g) => ({ gambar: g.gambar, judul: g.judul, kategori: g.kategori, keterangan: g.keterangan }))
     : BAWAAN
@@ -62,7 +54,7 @@ export default async function GaleriKategori({ params }: { params: Promise<{ kat
         remah={remah}
         label="Galeri"
         judul={`Dokumentasi ${info.label}`}
-        deskripsi={KETERANGAN[info.slug]}
+        deskripsi={keterangan[info.slug]}
         anak={
           <nav aria-label="Kategori lain" className="mt-8 flex flex-wrap gap-2">
             {KATEGORI_GALERI.filter((k) => k.slug !== info.slug && semua.some((b) => b.kategori === k.label)).map((k) => (

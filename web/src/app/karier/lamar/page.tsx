@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ambil, type Lowongan } from '@/lib/api'
+import { ambil, ambilPengaturan, type Lowongan } from '@/lib/api'
 import { MENU } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
 import { KepalaHalaman, TautanSaudara } from '@/komponen/bagian'
@@ -24,7 +24,9 @@ const REMAH = [
 const SAUDARA = MENU.find((m) => m.label === 'Karier')!.anak!
 
 export default async function KirimLamaran() {
-  const lowongan = (await ambil<Lowongan[]>('/lowongan')) ?? []
+  const [daftarLowongan, pengaturan] = await Promise.all([ambil<Lowongan[]>('/lowongan'), ambilPengaturan()])
+  const lowongan = daftarLowongan ?? []
+  const berkas = pengaturan.daftarBantuan?.berkasLamaran ?? []
 
   return (
     <>
@@ -73,14 +75,7 @@ export default async function KirimLamaran() {
             <div className="rounded-3xl border border-slate-200 p-7">
               <h2 className="text-base font-bold">Berkas yang perlu disiapkan</h2>
               <ul className="mt-4 space-y-2.5 text-sm text-slate-600">
-                {[
-                  'KTP elektronik',
-                  'Ijazah terakhir',
-                  'Surat Keterangan Catatan Kepolisian (SKCK)',
-                  'Surat keterangan sehat & bebas narkoba',
-                  'Pas foto terbaru',
-                  'KTA satuan pengamanan (bila ada)',
-                ].map((b) => (
+                {berkas.map((b) => (
                   <li key={b} className="flex items-start gap-2.5"><Centang className="mt-0.5 h-4 w-4 shrink-0 text-emas-600" />{b}</li>
                 ))}
               </ul>

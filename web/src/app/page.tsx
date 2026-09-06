@@ -26,46 +26,6 @@ export const metadata = buatMetadata({
   ],
 })
 
-const PILAR = [
-  {
-    kunci: 'KEAMANAN',
-    judul: 'Pengamanan',
-    ikon: 'shield',
-    isi: 'Satpam bersertifikat Gada Pratama, pengawalan VIP, dan pengamanan objek vital dengan RENPAM tertulis di setiap lokasi.',
-    warna: 'from-emas-500/20 to-emas-500/0',
-    tautan: '/layanan/pengamanan',
-  },
-  {
-    kunci: 'KEBERSIHAN',
-    judul: 'Kebersihan',
-    ikon: 'sparkles',
-    isi: 'Cleaning service gedung, rumah sakit, dan kawasan industri dengan pedoman 5R serta pengendalian hama terjadwal.',
-    warna: 'from-sky-400/20 to-sky-400/0',
-    tautan: '/layanan/kebersihan',
-  },
-  {
-    kunci: 'TENAGA_KERJA',
-    judul: 'Tenaga Kerja',
-    ikon: 'users',
-    isi: 'Manpower produksi, office boy, pramusaji, driver, dan operator forklift lengkap dengan pengelolaan BPJS dan upah.',
-    warna: 'from-emerald-400/20 to-emerald-400/0',
-    tautan: '/layanan/tenaga-kerja',
-  },
-]
-
-const METODE = [
-  { no: '01', judul: 'Pemetaan area', isi: 'Survei objek untuk memetakan titik masuk, jalur kendaraan, area kritis, dan titik buta pengawasan.' },
-  { no: '02', judul: 'Perumusan RENPAM', isi: 'Rencana Pengamanan disusun sesuai kerawanan objek, menentukan kekuatan personel dan pola jaga.' },
-  { no: '03', judul: 'Penurunan ke SOP', isi: 'RENPAM diterjemahkan menjadi SOP praktis yang dipegang setiap anggota di pos, cukup ringkas untuk dihafal.' },
-  { no: '04', judul: 'Pengawasan & evaluasi', isi: 'Danru, supervisor, dan manajer operasional mengawasi berjenjang; laporan bulanan menjadi bahan perbaikan.' },
-]
-
-const LEGAL_SINGKAT = [
-  { label: 'SIO Polri', nilai: '532/I/SIO-POLRI/2023' },
-  { label: 'ABUJAPI', nilai: '02846' },
-  { label: 'APKLINDO', nilai: '00495/PWK/X/2023' },
-  { label: 'ISO', nilai: '9001:2015' },
-]
 
 export default async function Beranda() {
   const data = await ambil<DataBeranda>('/beranda')
@@ -75,6 +35,9 @@ export default async function Beranda() {
   const artikel = data?.artikel ?? []
   const angka = data?.angka ?? { klien: 35, kota: 12, provinsi: 4 }
   const k = pengaturan.kontak
+  const b = pengaturan.beranda!
+  const hero = b.hero
+  const warnaPilar = ['from-emas-500/20 to-emas-500/0', 'from-sky-400/20 to-sky-400/0', 'from-emerald-400/20 to-emerald-400/0']
 
   const titikKantor = k
     ? [
@@ -95,24 +58,22 @@ export default async function Beranda() {
         <div className="wadah relative grid items-center gap-14 py-16 lg:grid-cols-[1.05fr_.95fr] lg:py-24">
           <div className="animate-naik">
             <span className="label-bagian-gelap">
-              <Perisai className="h-3.5 w-3.5" /> Berizin SIO Polri · ABUJAPI · APKLINDO
+              <Perisai className="h-3.5 w-3.5" /> {hero.label}
             </span>
 
             <h1 className="mt-6 text-4xl font-bold leading-[1.1] !text-white sm:text-5xl lg:text-6xl">
-              Pengabdian yang{' '}
+              {hero.judulAwal}{' '}
               <span className="relative whitespace-nowrap text-emas-400">
-                Tulus
+                {hero.judulSorot}
                 <svg className="absolute -bottom-2 left-0 w-full" height="10" viewBox="0 0 200 10" fill="none" aria-hidden="true">
                   <path d="M2 7c40-5 90-6 196-3" stroke="#f5b301" strokeWidth="3" strokeLinecap="round" opacity=".7" />
                 </svg>
               </span>{' '}
-              dan Gagah Berani
+              {hero.judulAkhir}
             </h1>
 
             <p className="mt-7 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
-              PT. Dharmapati Putra Nusantara menyediakan dan mengelola tenaga pengamanan, cleaning service,
-              serta tenaga kerja untuk industri, perkantoran, dan instansi pemerintah — dengan metode kerja
-              yang lahir dari disiplin Polisi Militer.
+              {hero.deskripsi}
             </p>
 
             <div className="mt-9 flex flex-wrap gap-3">
@@ -123,12 +84,7 @@ export default async function Beranda() {
             </div>
 
             <ul className="mt-10 grid gap-3 sm:grid-cols-2">
-              {[
-                'RENPAM & SOP disusun khusus tiap objek',
-                'Anggota bersertifikat Gada Pratama',
-                'Penggantian anggota maksimal 1x24 jam',
-                'BPJS & upah dikelola penuh oleh kami',
-              ].map((t) => (
+              {hero.poin.map((t) => (
                 <li key={t} className="flex items-start gap-2.5 text-sm text-slate-300">
                   <Centang className="mt-0.5 h-4 w-4 shrink-0 text-emas-400" />
                   {t}
@@ -140,7 +96,7 @@ export default async function Beranda() {
           <div className="relative animate-naik [animation-delay:.15s]">
             <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/40 sm:aspect-[5/5]">
               <Image
-                src={FOTO.hormat}
+                src={hero.gambar}
                 alt="Anggota Satpam Dharmapati memberi penghormatan di lokasi penempatan"
                 fill
                 priority
@@ -160,7 +116,7 @@ export default async function Beranda() {
 
             <div className="absolute -right-3 top-6 hidden whitespace-nowrap rounded-2xl border border-emas-500/30 bg-navy-950/95 px-5 py-3.5 shadow-xl backdrop-blur lg:block">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emas-400">Berdiri sejak</p>
-              <p className="font-judul text-2xl font-bold text-white">2016</p>
+              <p className="font-judul text-2xl font-bold text-white">{hero.tahunBerdiri}</p>
             </div>
           </div>
         </div>
@@ -168,7 +124,7 @@ export default async function Beranda() {
         {/* Bilah legalitas */}
         <div className="relative border-t border-white/10 bg-navy-950/60">
           <div className="wadah grid grid-cols-2 divide-x divide-white/10 sm:grid-cols-4">
-            {LEGAL_SINGKAT.map((l) => (
+            {b.legalSingkat.map((l) => (
               <div key={l.label} className="px-4 py-5 text-center">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emas-400">{l.label}</p>
                 <p className="mt-1 truncate text-xs text-slate-400">{l.nilai}</p>
@@ -188,13 +144,13 @@ export default async function Beranda() {
           />
 
           <div className="grid gap-6 lg:grid-cols-3">
-            {PILAR.map((p) => (
+            {b.pilar.map((p, i) => (
               <Link
-                key={p.kunci}
+                key={p.judul}
                 href={p.tautan}
                 className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition hover:-translate-y-1.5 hover:border-emas-300 hover:shadow-2xl hover:shadow-navy-900/10"
               >
-                <div className={`absolute inset-x-0 top-0 h-32 bg-gradient-to-b ${p.warna}`} aria-hidden="true" />
+                <div className={`absolute inset-x-0 top-0 h-32 bg-gradient-to-b ${warnaPilar[i % warnaPilar.length]}`} aria-hidden="true" />
                 <div className="relative">
                   <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-navy-950 text-emas-400">
                     <IkonLayanan nama={p.ikon} className="h-7 w-7" />
@@ -219,8 +175,8 @@ export default async function Beranda() {
             <JudulBagian
               gelap
               label="Cara kami bekerja"
-              judul="Empat langkah yang membuat penjagaan terukur, bukan sekadar berjaga"
-              deskripsi="Prinsip ini diwarisi dari pengalaman pendiri kami sebagai Polisi Militer TNI AL: pengamanan yang baik selalu dimulai dari dokumen, bukan dari jumlah orang."
+              judul={b.metode.judul}
+              deskripsi={b.metode.deskripsi}
             />
             <div className="relative aspect-[16/10] overflow-hidden rounded-3xl border border-white/10">
               <Image
@@ -234,9 +190,9 @@ export default async function Beranda() {
           </div>
 
           <ol className="space-y-4">
-            {METODE.map((m) => (
-              <li key={m.no} className="group flex gap-5 rounded-2xl border border-white/10 bg-white/[.03] p-6 transition hover:border-emas-500/40 hover:bg-white/[.06]">
-                <span className="font-judul text-3xl font-bold text-emas-500/60 transition group-hover:text-emas-400">{m.no}</span>
+            {b.metode.langkah.map((m, i) => (
+              <li key={m.judul} className="group flex gap-5 rounded-2xl border border-white/10 bg-white/[.03] p-6 transition hover:border-emas-500/40 hover:bg-white/[.06]">
+                <span className="font-judul text-3xl font-bold text-emas-500/60 transition group-hover:text-emas-400">{String(i + 1).padStart(2, '0')}</span>
                 <div>
                   <h3 className="text-lg font-bold !text-white">{m.judul}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-400">{m.isi}</p>

@@ -61,6 +61,12 @@ export default function HalamanRingkasan() {
 
       <h2 className="mb-4 mt-10 text-lg font-bold">Kelola konten</h2>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <li>
+          <Link href="/admin/ruang/pengaturan" className="flex items-center gap-3 rounded-2xl border border-emas-300 bg-emas-50 px-5 py-4 transition hover:shadow-md">
+            <span aria-hidden="true" className="text-lg">⚙️</span>
+            <span className="text-sm font-bold text-navy-900">Pengaturan Situs</span>
+          </Link>
+        </li>
         {SUMBER.map((s) => (
           <li key={s.kunci}>
             <Link href={`/admin/ruang/${s.kunci}`} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-emas-300 hover:shadow-md">

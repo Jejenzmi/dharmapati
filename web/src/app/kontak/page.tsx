@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import { ambilPengaturan } from '@/lib/api'
+import { ambil, ambilPengaturan, type Layanan } from '@/lib/api'
 import { MENU } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
 import { JudulBagian, KepalaHalaman, TautanSaudara } from '@/komponen/bagian'
@@ -21,8 +21,10 @@ const REMAH = [{ nama: 'Beranda', jalur: '/' }, { nama: 'Kontak', jalur: '/konta
 const SAUDARA = MENU.find((m) => m.label === 'Kontak')!.anak!
 
 export default async function HalamanKontak() {
-  const pengaturan = await ambilPengaturan()
+  const [pengaturan, layanan] = await Promise.all([ambilPengaturan(), ambil<Layanan[]>('/layanan')])
   const k = pengaturan.kontak!
+  const pilihanLayanan = (layanan ?? []).map((l) => l.nama)
+  const bantuan = pengaturan.daftarBantuan?.kontakButir ?? []
 
   return (
     <>
@@ -40,7 +42,7 @@ export default async function HalamanKontak() {
           <div>
             <JudulBagian label="Formulir" judul="Minta penawaran resmi" deskripsi="Semakin lengkap keterangan yang Anda isi, semakin akurat penawaran yang kami susun." />
             <Suspense fallback={<p className="text-sm text-slate-400">Memuat formulir…</p>}>
-              <FormulirKontak />
+              <FormulirKontak pilihanLayanan={pilihanLayanan} />
             </Suspense>
           </div>
 
@@ -89,11 +91,7 @@ export default async function HalamanKontak() {
             <div className="rounded-3xl border border-slate-200 p-7">
               <h2 className="text-base font-bold">Yang perlu kami tahu</h2>
               <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-600">
-                <li>Lokasi dan luas area objek</li>
-                <li>Jumlah pos dan shift yang diinginkan</li>
-                <li>Jam operasional</li>
-                <li>Kebutuhan perlengkapan khusus</li>
-                <li>Target waktu mulai</li>
+                {bantuan.map((b) => <li key={b}>{b}</li>)}
               </ul>
             </div>
           </aside>

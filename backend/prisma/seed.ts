@@ -450,6 +450,171 @@ const PENGATURAN: Record<string, unknown> = {
       { judul: 'Peralatan kebersihan', butir: ['Mesin poles lantai dan vacuum basah/kering', 'Trolley dan alat kebersihan lengkap', 'Bahan kimia sesuai jenis permukaan', 'Perlengkapan keselamatan kerja'] },
     ],
   },
+
+  beranda: {
+    hero: {
+      label: 'Berizin SIO Polri · ABUJAPI · APKLINDO',
+      judulAwal: 'Pengabdian yang',
+      judulSorot: 'Tulus',
+      judulAkhir: 'dan Gagah Berani',
+      deskripsi:
+        'PT. Dharmapati Putra Nusantara menyediakan dan mengelola tenaga pengamanan, cleaning service, serta tenaga kerja untuk industri, perkantoran, dan instansi pemerintah — dengan metode kerja yang lahir dari disiplin Polisi Militer.',
+      poin: [
+        'RENPAM & SOP disusun khusus tiap objek',
+        'Anggota bersertifikat Gada Pratama',
+        'Penggantian anggota maksimal 1x24 jam',
+        'BPJS & upah dikelola penuh oleh kami',
+      ],
+      gambar: '/galeri/sec-h12-2432-751ec36794.jpg',
+      tahunBerdiri: '2016',
+    },
+    pilar: [
+      {
+        judul: 'Pengamanan',
+        ikon: 'shield',
+        isi: 'Satpam bersertifikat Gada Pratama, pengawalan VIP, dan pengamanan objek vital dengan RENPAM tertulis di setiap lokasi.',
+        tautan: '/layanan/pengamanan',
+      },
+      {
+        judul: 'Kebersihan',
+        ikon: 'sparkles',
+        isi: 'Cleaning service gedung, rumah sakit, dan kawasan industri dengan pedoman 5R serta pengendalian hama terjadwal.',
+        tautan: '/layanan/kebersihan',
+      },
+      {
+        judul: 'Tenaga Kerja',
+        ikon: 'users',
+        isi: 'Manpower produksi, office boy, pramusaji, driver, dan operator forklift lengkap dengan pengelolaan BPJS dan upah.',
+        tautan: '/layanan/tenaga-kerja',
+      },
+    ],
+    metode: {
+      judul: 'Empat langkah yang membuat penjagaan terukur, bukan sekadar berjaga',
+      deskripsi:
+        'Prinsip ini diwarisi dari pengalaman pendiri kami sebagai Polisi Militer TNI AL: pengamanan yang baik selalu dimulai dari dokumen, bukan dari jumlah orang.',
+      langkah: [
+        { judul: 'Pemetaan area', isi: 'Survei objek untuk memetakan titik masuk, jalur kendaraan, area kritis, dan titik buta pengawasan.' },
+        { judul: 'Perumusan RENPAM', isi: 'Rencana Pengamanan disusun sesuai kerawanan objek, menentukan kekuatan personel dan pola jaga.' },
+        { judul: 'Penurunan ke SOP', isi: 'RENPAM diterjemahkan menjadi SOP praktis yang dipegang setiap anggota di pos, cukup ringkas untuk dihafal.' },
+        { judul: 'Pengawasan & evaluasi', isi: 'Danru, supervisor, dan manajer operasional mengawasi berjenjang; laporan bulanan menjadi bahan perbaikan.' },
+      ],
+    },
+    legalSingkat: [
+      { label: 'SIO Polri', nilai: '532/I/SIO-POLRI/2023' },
+      { label: 'ABUJAPI', nilai: '02846' },
+      { label: 'APKLINDO', nilai: '00495/PWK/X/2023' },
+      { label: 'ISO', nilai: '9001:2015' },
+    ],
+  },
+
+  profil: {
+    paragraf: [
+      'PT. Dharmapati Putra Nusantara adalah perusahaan profesional di bidang penyediaan (recruitment) dan pengelolaan tenaga kerja (outsourcing): tenaga pengamanan, manpower, cleaning service, office boy, driver, operator forklift, serta tenaga kerja non-skill lainnya.',
+      'Kami dibentuk pada 27 Januari 2020 sebagai pengembangan dari PT. Dharmapati Utama Nusantara, untuk menjawab keterbatasan tenaga pengamanan yang tersedia dari aparat pemerintah seiring meningkatnya level ancaman — terutama di sektor industri, perbankan, dan perusahaan swasta lainnya.',
+      'Sampai hari ini kami berpengalaman mengelola keamanan dan tenaga kerja di berbagai lokasi: instansi pemerintah, perkantoran, kawasan industri, perhotelan, pergudangan, dan perumahan.',
+    ],
+    poin: [
+      'Berizin operasional Polri dan terdaftar ABUJAPI',
+      'Anggota APKLINDO untuk lini cleaning service',
+      'Sistem manajemen mutu ISO 9001:2015',
+      'Pusdiklat sendiri di Gantar, Indramayu',
+    ],
+    gambar: '/galeri/sec-h03-585-b0ba4753d0.jpg',
+  },
+
+  lini: {
+    KEAMANAN: {
+      ringkas: 'Menjaga objek, orang, dan ketertiban dengan personel bersertifikat serta rencana pengamanan tertulis di setiap lokasi.',
+      gambar: '/galeri/sec-h11-2227-f0deb6570a.jpg',
+      intro:
+        'Lini pengamanan adalah asal-usul Dharmapati. Pola kerjanya diwarisi langsung dari pengalaman pendiri kami sebagai Polisi Militer TNI AL: setiap objek dipetakan lebih dulu, dituangkan ke dalam Rencana Pengamanan, lalu diturunkan menjadi SOP yang dipegang tiap anggota di pos.',
+      gambarRinci: '/galeri/sec-h12-2430-51100a94ed.jpg',
+      poin: [
+        { judul: 'Anggota bersertifikat', isi: 'Seluruh anggota telah mengikuti pelatihan Gada Pratama dan memiliki Kartu Tanda Anggota satuan pengamanan.' },
+        { judul: 'Dokumen kerja tertulis', isi: 'RENPAM dan SOP disusun khusus per objek, bukan salinan dari lokasi lain.' },
+        { judul: 'Pengawasan berjenjang', isi: 'Danru di lokasi, supervisor yang berkunjung rutin, dan manajer operasional di kantor pusat.' },
+        { judul: 'Pelaporan berkala', isi: 'Buku mutasi harian, laporan kehadiran, dan rekap insiden bulanan diserahkan ke pengguna jasa.' },
+      ],
+    },
+    KEBERSIHAN: {
+      ringkas: 'Menjaga gedung tetap bersih dan sehat lewat jadwal terdokumentasi, bahan kimia yang tepat, dan pengendalian hama berkala.',
+      gambar: '/galeri/cln-h12-168-a2bc7dd7f2.jpg',
+      intro:
+        'Mutu kebersihan biasanya bagus di bulan pertama lalu menurun. Kami mencegahnya dengan menghitung beban kerja per zona, menyusun jadwal harian sampai bulanan yang bisa diperiksa pengguna jasa, dan menerapkan pedoman 5R sebagai kebiasaan kerja.',
+      gambarRinci: '/galeri/cln-h11-161-179a90a440.jpg',
+      poin: [
+        { judul: 'Anggota APKLINDO', isi: 'Terdaftar di Asosiasi Perusahaan Klining Servis Indonesia sejak 2023.' },
+        { judul: 'Bahan kimia sesuai permukaan', isi: 'Pemilihan chemical disesuaikan jenis lantai, kaca, dan furnitur agar tidak merusak aset.' },
+        { judul: 'Ceklis area per shift', isi: 'Setiap area ditandatangani petugas dan diperiksa supervisor kebersihan.' },
+        { judul: 'Pengendalian hama terjadwal', isi: 'Inspeksi, kartu kendali per titik umpan, dan laporan kunjungan berkala.' },
+      ],
+    },
+    TENAGA_KERJA: {
+      ringkas: 'Menyediakan tenaga kerja siap pakai berikut seluruh pengelolaan administrasi ketenagakerjaannya.',
+      gambar: '/galeri/cln-h16-316-83e033c208.jpg',
+      intro:
+        'Kami menyediakan tenaga kerja dengan alur rekrutmen yang sama ketatnya dengan penerimaan Satpam. Seluruh kewajiban ketenagakerjaan — upah, lembur, BPJS Ketenagakerjaan, dan BPJS Kesehatan — menjadi tanggung jawab kami sebagai pemberi kerja.',
+      gambarRinci: '/galeri/cln-h15-192-20915eb927.jpg',
+      poin: [
+        { judul: 'Izin KBLI 78200', isi: 'Aktivitas Penyediaan Tenaga Kerja Waktu Tertentu, sehingga penempatan sah secara regulasi.' },
+        { judul: 'Seleksi berjenjang', isi: 'Administrasi, wawancara, uji fisik, dan pemeriksaan kesehatan sebelum penempatan.' },
+        { judul: 'Administrasi penuh', isi: 'Absensi, penggajian, lembur, dan kepesertaan BPJS dikelola kantor pusat.' },
+        { judul: 'Penggantian tenaga', isi: 'Tenaga yang tidak sesuai kualifikasi diganti tanpa biaya tambahan.' },
+      ],
+    },
+    PENDUKUNG: {
+      ringkas: 'Layanan pelengkap yang membuat pengelolaan fasilitas Anda tuntas dalam satu kontrak.',
+      gambar: '/galeri/sec-h15-3022-2cb5796d8c.jpg',
+      intro:
+        'Layanan pendukung melengkapi dua lini utama agar pengelolaan fasilitas Anda tuntas dalam satu kontrak — mulai dari perawatan lanskap dan pengaturan parkir sampai pelatihan satuan pengamanan internal perusahaan.',
+      gambarRinci: '/galeri/sec-h15-3020-a4bc0ea075.jpg',
+      poin: [
+        { judul: 'Pusdiklat sendiri', isi: 'Pusat pendidikan dan pelatihan di Gantar, Kabupaten Indramayu.' },
+        { judul: 'Materi lengkap', isi: 'Dari pengetahuan dasar Polri, PBB dan PPM, bela diri, drill damkar, sampai SMK-3 dasar.' },
+        { judul: 'Izin perparkiran & taman', isi: 'KBLI 52215 dan 81300 untuk parkir di luar badan jalan dan perawatan taman.' },
+        { judul: 'Terhubung pos jaga', isi: 'Pencatatan keluar-masuk kendaraan tersambung dengan anggota di pos.' },
+      ],
+    },
+  },
+
+  jaminanLegalitas: {
+    butir: [
+      { judul: 'Izin operasional Polri', isi: 'Penempatan anggota Satpam dilakukan di bawah Surat Izin Operasional yang diterbitkan Kepolisian Negara Republik Indonesia.' },
+      { judul: 'Terdaftar di asosiasi', isi: 'Anggota ABUJAPI untuk lini pengamanan dan APKLINDO untuk lini cleaning service.' },
+      { judul: 'Pengusaha Kena Pajak', isi: 'Berstatus PKP sehingga penagihan dapat disertai faktur pajak sesuai ketentuan.' },
+      { judul: 'Sistem mutu ISO 9001:2015', isi: 'Prosedur kerja, pencatatan, dan evaluasi mengacu pada sistem manajemen mutu.' },
+    ],
+  },
+
+  galeriKategori: {
+    perusahaan: 'Kantor pusat, ruang kerja, dan tim administrasi yang menopang seluruh penempatan di lapangan.',
+    pengamanan: 'Anggota Satpam Dharmapati saat bertugas di pos jaga, lobi, dan area produksi pengguna jasa.',
+    supervisi: 'Kunjungan supervisor, apel pagi, dan pemeriksaan buku mutasi di objek penempatan.',
+    pelatihan: 'Kegiatan di Pusdiklat Gantar: bela diri, drill tongkat dan borgol, drill damkar, PBB, serta SMK-3 dasar.',
+    rekrutmen: 'Tahapan seleksi calon anggota, dari administrasi dan wawancara sampai upacara pelepasan.',
+    'cleaning-service': 'Pekerjaan kebersihan harian di gedung perkantoran, area produksi, toilet, dan area terbuka.',
+    pramusaji: 'Tenaga pramusaji dan pantry saat menyiapkan hidangan serta melayani tamu.',
+    manpower: 'Tenaga produksi dan operator di lini pabrik, gudang, dan gerbang kawasan industri.',
+  },
+
+  daftarBantuan: {
+    kontakButir: [
+      'Lokasi dan luas area objek',
+      'Jumlah pos dan shift yang diinginkan',
+      'Jam operasional',
+      'Kebutuhan perlengkapan khusus',
+      'Target waktu mulai',
+    ],
+    berkasLamaran: [
+      'KTP elektronik',
+      'Ijazah terakhir',
+      'Surat Keterangan Catatan Kepolisian (SKCK)',
+      'Surat keterangan sehat & bebas narkoba',
+      'Pas foto terbaru',
+      'KTA satuan pengamanan (bila ada)',
+    ],
+  },
+
   seo: {
     judulBawaan: 'PT. Dharmapati Putra Nusantara — Jasa Pengamanan, Cleaning Service & Tenaga Kerja',
     deskripsiBawaan:
@@ -482,29 +647,31 @@ async function main() {
     },
   })
 
+  // Seluruh penanaman bersifat menambah, bukan menimpa: perubahan lewat panel admin
+  // harus selamat setiap kali wadah dijalankan ulang.
   for (const l of LAYANAN) {
-    await prisma.layanan.upsert({
-      where: { slug: l.slug },
-      update: l,
-      create: l,
-    })
+    const ada = await prisma.layanan.findUnique({ where: { slug: l.slug } })
+    if (!ada) await prisma.layanan.create({ data: l })
   }
 
-  await prisma.legalitas.deleteMany()
-  await prisma.legalitas.createMany({ data: LEGALITAS })
+  if ((await prisma.legalitas.count()) === 0) {
+    await prisma.legalitas.createMany({ data: LEGALITAS })
+  }
 
   for (const k of KBLI) {
-    await prisma.kbli.upsert({ where: { kode: k.kode }, update: k, create: k })
+    const ada = await prisma.kbli.findUnique({ where: { kode: k.kode } })
+    if (!ada) await prisma.kbli.create({ data: k })
   }
 
-  await prisma.personel.deleteMany()
-  await prisma.personel.createMany({ data: PERSONEL })
+  if ((await prisma.personel.count()) === 0) {
+    await prisma.personel.createMany({ data: PERSONEL })
+  }
 
   // Klien + koordinat peta
-  await prisma.klien.deleteMany()
+  const sudahAdaKlien = (await prisma.klien.count()) > 0
   const hitungKota: Record<string, number> = {}
   let urutan = 0
-  for (const k of KLIEN) {
+  for (const k of (sudahAdaKlien ? [] : KLIEN)) {
     const pusat = KOTA[k.kota]
     const n = (hitungKota[k.kota] = (hitungKota[k.kota] ?? 0) + 1)
     const { dLat, dLng } = geser(n - 1)
@@ -528,27 +695,23 @@ async function main() {
     await prisma.galeri.createMany({ data: GALERI })
   }
 
-  await prisma.faq.deleteMany()
-  await prisma.faq.createMany({ data: FAQ })
+  if ((await prisma.faq.count()) === 0) {
+    await prisma.faq.createMany({ data: FAQ })
+  }
 
   for (const a of ARTIKEL) {
-    await prisma.artikel.upsert({
-      where: { slug: a.slug },
-      update: { ...a, tag: [a.kategori] },
-      create: { ...a, tag: [a.kategori] },
-    })
+    const ada = await prisma.artikel.findUnique({ where: { slug: a.slug } })
+    if (!ada) await prisma.artikel.create({ data: { ...a, tag: [a.kategori] } })
   }
 
   for (const l of LOWONGAN) {
-    await prisma.lowongan.upsert({ where: { slug: l.slug }, update: l, create: l })
+    const ada = await prisma.lowongan.findUnique({ where: { slug: l.slug } })
+    if (!ada) await prisma.lowongan.create({ data: l })
   }
 
   for (const [kunci, nilai] of Object.entries(PENGATURAN)) {
-    await prisma.pengaturan.upsert({
-      where: { kunci },
-      update: { nilai: nilai as any },
-      create: { kunci, nilai: nilai as any },
-    })
+    const ada = await prisma.pengaturan.findUnique({ where: { kunci } })
+    if (!ada) await prisma.pengaturan.create({ data: { kunci, nilai: nilai as any } })
   }
 
   const jumlahKlien = await prisma.klien.count()

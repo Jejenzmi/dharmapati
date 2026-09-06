@@ -72,14 +72,13 @@ export default function PetaKlien({ klien, kantor = [], tinggi = '560px', ringka
         zoomControl: true,
         attributionControl: true,
       })
-      // Peta dasar Esri Light Gray: bersih, tanpa kunci API, penanda mudah terbaca
+      // Peta dasar Esri World Street Map: berwarna, tanpa kunci API
       L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-        { attribution: 'Ubin peta &copy; <a href="https://www.esri.com/">Esri</a> — sumber: Esri, HERE, Garmin, &copy; kontributor OpenStreetMap', maxZoom: 16 },
-      ).addTo(peta)
-      L.tileLayer(
-        'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
-        { maxZoom: 16, pane: 'overlayPane' },
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: 'Ubin peta &copy; <a href="https://www.esri.com/">Esri</a> — sumber: Esri, HERE, Garmin, &copy; kontributor OpenStreetMap',
+          maxZoom: 18,
+        },
       ).addTo(peta)
       peta.on('click', () => setTerpilih(null))
       petaRef.current = peta

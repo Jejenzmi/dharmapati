@@ -100,6 +100,23 @@ export type Pengaturan = {
   rekrutmen?: { tahapan: { judul: string; isi: string }[]; kriteria: string[] }
   pelatihan?: { kelompok: { judul: string; butir: string[] }[] }
   perlengkapan?: { kelompok: { judul: string; butir: string[] }[] }
+  beranda?: {
+    hero: {
+      label: string; judulAwal: string; judulSorot: string; judulAkhir: string
+      deskripsi: string; poin: string[]; gambar: string; tahunBerdiri: string
+    }
+    pilar: { judul: string; ikon: string; isi: string; tautan: string }[]
+    metode: { judul: string; deskripsi: string; langkah: { judul: string; isi: string }[] }
+    legalSingkat: { label: string; nilai: string }[]
+  }
+  profil?: { paragraf: string[]; poin: string[]; gambar: string }
+  lini?: Record<string, {
+    ringkas: string; gambar: string; intro: string; gambarRinci: string
+    poin: { judul: string; isi: string }[]
+  }>
+  jaminanLegalitas?: { butir: { judul: string; isi: string }[] }
+  galeriKategori?: Record<string, string>
+  daftarBantuan?: { kontakButir: string[]; berkasLamaran: string[] }
   seo?: { judulBawaan: string; deskripsiBawaan: string; kataKunci: string[] }
 }
 
@@ -136,6 +153,54 @@ export const PENGATURAN_CADANGAN: Pengaturan = {
     petaCabang: { lat: -6.1583, lng: 106.9077 },
     petaPusdiklat: { lat: -6.4497, lng: 107.9564 },
   },
+  beranda: {
+    hero: {
+      label: 'Berizin SIO Polri · ABUJAPI · APKLINDO',
+      judulAwal: 'Pengabdian yang',
+      judulSorot: 'Tulus',
+      judulAkhir: 'dan Gagah Berani',
+      deskripsi:
+        'PT. Dharmapati Putra Nusantara menyediakan dan mengelola tenaga pengamanan, cleaning service, serta tenaga kerja untuk industri, perkantoran, dan instansi pemerintah.',
+      poin: [
+        'RENPAM & SOP disusun khusus tiap objek',
+        'Anggota bersertifikat Gada Pratama',
+        'Penggantian anggota maksimal 1x24 jam',
+        'BPJS & upah dikelola penuh oleh kami',
+      ],
+      gambar: '/galeri/sec-h12-2432-751ec36794.jpg',
+      tahunBerdiri: '2016',
+    },
+    pilar: [
+      { judul: 'Pengamanan', ikon: 'shield', isi: 'Satpam bersertifikat, pengawalan VIP, dan pengamanan objek vital.', tautan: '/layanan/pengamanan' },
+      { judul: 'Kebersihan', ikon: 'sparkles', isi: 'Cleaning service gedung dan pengendalian hama terjadwal.', tautan: '/layanan/kebersihan' },
+      { judul: 'Tenaga Kerja', ikon: 'users', isi: 'Manpower, office boy, driver, dan operator forklift.', tautan: '/layanan/tenaga-kerja' },
+    ],
+    metode: {
+      judul: 'Empat langkah yang membuat penjagaan terukur, bukan sekadar berjaga',
+      deskripsi: 'Pengamanan yang baik selalu dimulai dari dokumen, bukan dari jumlah orang.',
+      langkah: [
+        { judul: 'Pemetaan area', isi: 'Survei objek untuk memetakan titik masuk, jalur kendaraan, dan area kritis.' },
+        { judul: 'Perumusan RENPAM', isi: 'Rencana Pengamanan disusun sesuai kerawanan objek.' },
+        { judul: 'Penurunan ke SOP', isi: 'RENPAM diterjemahkan menjadi SOP praktis yang dipegang tiap anggota.' },
+        { judul: 'Pengawasan & evaluasi', isi: 'Pengawasan berjenjang dengan laporan bulanan.' },
+      ],
+    },
+    legalSingkat: [
+      { label: 'SIO Polri', nilai: '532/I/SIO-POLRI/2023' },
+      { label: 'ABUJAPI', nilai: '02846' },
+      { label: 'APKLINDO', nilai: '00495/PWK/X/2023' },
+      { label: 'ISO', nilai: '9001:2015' },
+    ],
+  },
+  profil: {
+    paragraf: ['PT. Dharmapati Putra Nusantara adalah perusahaan penyediaan dan pengelolaan tenaga kerja: pengamanan, cleaning service, manpower, office boy, driver, dan operator forklift.'],
+    poin: ['Berizin operasional Polri dan terdaftar ABUJAPI', 'Anggota APKLINDO', 'ISO 9001:2015', 'Pusdiklat sendiri di Indramayu'],
+    gambar: '/galeri/sec-h03-585-b0ba4753d0.jpg',
+  },
+  lini: {},
+  jaminanLegalitas: { butir: [] },
+  galeriKategori: {},
+  daftarBantuan: { kontakButir: [], berkasLamaran: [] },
   seo: {
     judulBawaan: 'PT. Dharmapati Putra Nusantara — Jasa Pengamanan, Cleaning Service & Tenaga Kerja',
     deskripsiBawaan:

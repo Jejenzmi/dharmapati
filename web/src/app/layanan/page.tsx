@@ -1,8 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ambil, type Layanan } from '@/lib/api'
+import { ambil, ambilPengaturan, type Layanan } from '@/lib/api'
 import { FOTO } from '@/lib/foto'
-import { LINI_LAYANAN, slugDariLini } from '@/lib/navigasi'
+import { LINI_LAYANAN } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
 import { AjakanBertindak, JudulBagian, KepalaHalaman } from '@/komponen/bagian'
 import { IkonLayanan, Panah } from '@/komponen/ikon'
@@ -22,27 +22,10 @@ export const metadata = buatMetadata({
 
 const REMAH = [{ nama: 'Beranda', jalur: '/' }, { nama: 'Layanan', jalur: '/layanan' }]
 
-const RINGKAS: Record<string, { isi: string; foto: string }> = {
-  KEAMANAN: {
-    isi: 'Menjaga objek, orang, dan ketertiban dengan personel bersertifikat serta rencana pengamanan tertulis di setiap lokasi.',
-    foto: FOTO.hormatKantor,
-  },
-  KEBERSIHAN: {
-    isi: 'Menjaga gedung tetap bersih dan sehat lewat jadwal terdokumentasi, bahan kimia yang tepat, dan pengendalian hama berkala.',
-    foto: FOTO.bersihLantai,
-  },
-  TENAGA_KERJA: {
-    isi: 'Menyediakan tenaga kerja siap pakai berikut seluruh pengelolaan administrasi ketenagakerjaannya.',
-    foto: FOTO.manpowerMesin,
-  },
-  PENDUKUNG: {
-    isi: 'Layanan pelengkap yang membuat pengelolaan fasilitas Anda tuntas dalam satu kontrak.',
-    foto: FOTO.smk3,
-  },
-}
-
 export default async function IkhtisarLayanan() {
-  const layanan = (await ambil<Layanan[]>('/layanan')) ?? []
+  const [layanan, pengaturan] = await Promise.all([ambil<Layanan[]>('/layanan'), ambilPengaturan()])
+  const daftar = layanan ?? []
+  const lini = pengaturan.lini ?? {}
 
   return (
     <>
@@ -57,28 +40,28 @@ export default async function IkhtisarLayanan() {
 
       <section className="py-20 sm:py-24">
         <div className="wadah space-y-8">
-          {LINI_LAYANAN.map((lini, i) => {
-            const isi = layanan.filter((x) => x.lini === lini.kunci)
-            const r = RINGKAS[lini.kunci]
+          {LINI_LAYANAN.map((l, i) => {
+            const isi = daftar.filter((x) => x.lini === l.kunci)
+            const r = lini[l.kunci]
             return (
               <article
-                key={lini.slug}
+                key={l.slug}
                 className={`grid items-center gap-8 overflow-hidden rounded-3xl border border-slate-200 bg-white lg:grid-cols-2 ${i % 2 ? 'lg:[&>figure]:order-last' : ''}`}
               >
                 <figure className="relative aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[300px]">
-                  <Image src={r.foto} alt={`Lini layanan ${lini.label}`} fill sizes="(max-width:1024px) 100vw, 50vw" className="object-cover" />
+                  <Image src={r?.gambar ?? FOTO.hormat} alt={`Lini layanan ${l.label}`} fill sizes="(max-width:1024px) 100vw, 50vw" className="object-cover" />
                 </figure>
 
                 <div className="p-8 lg:p-10">
                   <span className="label-bagian">Lini {i + 1} · {isi.length} layanan</span>
-                  <h2 className="mt-4 text-2xl font-bold sm:text-3xl">{lini.label}</h2>
-                  <p className="mt-3 text-[15px] leading-relaxed text-slate-600">{r.isi}</p>
+                  <h2 className="mt-4 text-2xl font-bold sm:text-3xl">{l.label}</h2>
+                  <p className="mt-3 text-[15px] leading-relaxed text-slate-600">{r?.ringkas}</p>
 
                   <ul className="mt-6 space-y-2">
                     {isi.map((s) => (
                       <li key={s.id}>
                         <Link
-                          href={`/layanan/${lini.slug}/${s.slug}`}
+                          href={`/layanan/${l.slug}/${s.slug}`}
                           className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-slate-50"
                         >
                           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emas-500/10 text-emas-600 transition group-hover:bg-emas-500 group-hover:text-navy-950">
@@ -91,8 +74,8 @@ export default async function IkhtisarLayanan() {
                     ))}
                   </ul>
 
-                  <Link href={`/layanan/${lini.slug}`} className="tombol-navy mt-7">
-                    Selengkapnya tentang {lini.label} <Panah className="h-4 w-4" />
+                  <Link href={`/layanan/${l.slug}`} className="tombol-navy mt-7">
+                    Selengkapnya tentang {l.label} <Panah className="h-4 w-4" />
                   </Link>
                 </div>
               </article>
@@ -100,7 +83,7 @@ export default async function IkhtisarLayanan() {
           })}
         </div>
 
-        {!layanan.length && <p className="wadah pt-10 text-center text-slate-400">Daftar layanan belum tersedia.</p>}
+        {!daftar.length && <p className="wadah pt-10 text-center text-slate-400">Daftar layanan belum tersedia.</p>}
       </section>
 
       <AjakanBertindak />

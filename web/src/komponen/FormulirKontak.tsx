@@ -5,22 +5,9 @@ import { useSearchParams } from 'next/navigation'
 import { API_PERAMBAN } from '@/lib/api'
 import { Centang, Panah } from './ikon'
 
-const LAYANAN = [
-  'Jasa Pengamanan (Satpam)',
-  'Pengawalan VIP & Protokoler',
-  'Cleaning Service',
-  'Pengendalian Hama (Pest Control)',
-  'Manpower & Tenaga Produksi',
-  'Office Boy & Pramusaji',
-  'Driver & Operator Forklift',
-  'Perawatan Taman & Parkir',
-  'Pelatihan & Sertifikasi',
-  'Lainnya',
-]
-
 type Keadaan = 'diam' | 'kirim' | 'berhasil' | 'gagal'
 
-export default function FormulirKontak() {
+export default function FormulirKontak({ pilihanLayanan = [] }: { pilihanLayanan?: string[] }) {
   const parameter = useSearchParams()
   const layananAwal = parameter.get('layanan') ?? ''
   const [keadaan, setKeadaan] = useState<Keadaan>('diam')
@@ -86,7 +73,7 @@ export default function FormulirKontak() {
           <span className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-slate-500">Layanan yang dibutuhkan</span>
           <select name="layanan" defaultValue={layananAwal} className={kelasIsian}>
             <option value="">Pilih layanan…</option>
-            {LAYANAN.map((l) => <option key={l} value={l}>{l}</option>)}
+            {[...pilihanLayanan, 'Lainnya'].map((l) => <option key={l} value={l}>{l}</option>)}
           </select>
         </label>
         <label className="block">

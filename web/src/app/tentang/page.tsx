@@ -24,6 +24,7 @@ export default async function ProfilPerusahaan() {
   const pengaturan = await ambilPengaturan()
   const p = pengaturan.perusahaan
   const k = pengaturan.kontak
+  const profil = pengaturan.profil
 
   return (
     <>
@@ -53,29 +54,11 @@ export default async function ProfilPerusahaan() {
           <div>
             <JudulBagian label="Sekilas" judul="Siapa kami" />
             <div className="prosa">
-              <p>
-                <strong>{p?.nama}</strong> adalah perusahaan profesional di bidang penyediaan (recruitment)
-                dan pengelolaan tenaga kerja (outsourcing): tenaga pengamanan, manpower, cleaning service,
-                office boy, driver, operator forklift, serta tenaga kerja non-skill lainnya.
-              </p>
-              <p>
-                Kami dibentuk pada 27 Januari 2020 sebagai pengembangan dari {p?.induk}, untuk menjawab
-                keterbatasan tenaga pengamanan yang tersedia dari aparat pemerintah seiring meningkatnya
-                level ancaman — terutama di sektor industri, perbankan, dan perusahaan swasta lainnya.
-              </p>
-              <p>
-                Sampai hari ini kami berpengalaman mengelola keamanan dan tenaga kerja di berbagai lokasi:
-                instansi pemerintah, perkantoran, kawasan industri, perhotelan, pergudangan, dan perumahan.
-              </p>
+              {(profil?.paragraf ?? []).map((teks) => <p key={teks.slice(0, 30)}>{teks}</p>)}
             </div>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {[
-                'Berizin operasional Polri dan terdaftar ABUJAPI',
-                'Anggota APKLINDO untuk lini cleaning service',
-                'Sistem manajemen mutu ISO 9001:2015',
-                'Pusdiklat sendiri di Gantar, Indramayu',
-              ].map((t) => (
+              {(profil?.poin ?? []).map((t) => (
                 <p key={t} className="flex items-start gap-2.5 text-sm text-slate-600">
                   <Centang className="mt-0.5 h-4 w-4 shrink-0 text-emas-600" />{t}
                 </p>
@@ -103,7 +86,7 @@ export default async function ProfilPerusahaan() {
 
           <div className="relative">
             <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl shadow-navy-900/10">
-              <Image src={FOTO.kantor} alt="Kantor pusat PT. Dharmapati Putra Nusantara di Purwakarta" fill sizes="(max-width:1024px) 100vw, 40vw" className="object-cover" />
+              <Image src={profil?.gambar ?? FOTO.kantor} alt="Kantor pusat PT. Dharmapati Putra Nusantara di Purwakarta" fill sizes="(max-width:1024px) 100vw, 40vw" className="object-cover" />
             </div>
             <div className="absolute -bottom-6 -right-4 rounded-2xl bg-navy-950 px-6 py-5 text-white shadow-xl">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emas-400">Berdiri</p>

@@ -60,6 +60,14 @@ export default function Kerangka({ children }: { children: React.ReactNode }) {
       >
         📊 Ringkasan
       </Link>
+      <Link
+        href="/admin/ruang/pengaturan"
+        className={`flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+          aktif('/admin/ruang/pengaturan') ? 'bg-emas-500 text-navy-950' : 'text-slate-300 hover:bg-white/5'
+        }`}
+      >
+        ⚙️ Pengaturan Situs
+      </Link>
       {SUMBER.map((s) => {
         const jalur = `/admin/ruang/${s.kunci}`
         const lencana = s.kunci === 'pesan' ? hitung.pesanBaru : s.kunci === 'lamaran' ? hitung.lamaranBaru : 0

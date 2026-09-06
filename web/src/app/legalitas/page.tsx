@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ambil, type Legalitas } from '@/lib/api'
+import { ambil, ambilPengaturan, type Legalitas } from '@/lib/api'
 import { MENU } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
 import { AjakanBertindak, JudulBagian, KepalaHalaman, TautanSaudara } from '@/komponen/bagian'
@@ -18,16 +18,13 @@ export const metadata = buatMetadata({
 const REMAH = [{ nama: 'Beranda', jalur: '/' }, { nama: 'Legalitas', jalur: '/legalitas' }]
 const SAUDARA = MENU.find((m) => m.label === 'Legalitas')!.anak!
 
-const JAMINAN = [
-  { judul: 'Izin operasional Polri', isi: 'Penempatan anggota Satpam dilakukan di bawah Surat Izin Operasional yang diterbitkan Kepolisian Negara Republik Indonesia.' },
-  { judul: 'Terdaftar di asosiasi', isi: 'Anggota ABUJAPI untuk lini pengamanan dan APKLINDO untuk lini cleaning service.' },
-  { judul: 'Pengusaha Kena Pajak', isi: 'Berstatus PKP sehingga penagihan dapat disertai faktur pajak sesuai ketentuan.' },
-  { judul: 'Sistem mutu ISO 9001:2015', isi: 'Prosedur kerja, pencatatan, dan evaluasi mengacu pada sistem manajemen mutu.' },
-]
-
 export default async function DokumenLegalitas() {
-  const data = await ambil<{ legalitas: Legalitas[] }>('/legalitas')
+  const [data, pengaturan] = await Promise.all([
+    ambil<{ legalitas: Legalitas[] }>('/legalitas'),
+    ambilPengaturan(),
+  ])
   const legalitas = data?.legalitas ?? []
+  const jaminan = pengaturan.jaminanLegalitas?.butir ?? []
 
   return (
     <>
@@ -43,7 +40,7 @@ export default async function DokumenLegalitas() {
       <section className="py-16 sm:py-20">
         <div className="wadah">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {JAMINAN.map((j) => (
+            {jaminan.map((j) => (
               <div key={j.judul} className="rounded-2xl border border-slate-200 bg-white p-6">
                 <Perisai className="mb-4 h-6 w-6 text-emas-600" />
                 <h2 className="text-base font-bold leading-snug">{j.judul}</h2>
