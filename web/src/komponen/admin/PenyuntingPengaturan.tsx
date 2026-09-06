@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { apiAdmin } from '@/lib/admin'
 import { KELOMPOK_PENGATURAN, type BidangP, type KelompokPengaturan } from '@/lib/pengaturan-skema'
-import { Centang, Panah, Silang } from '../ikon'
+import { Panah, Silang } from '../ikon'
+import { usePanel } from './Panel'
 
 type Isi = Record<string, any>
 
@@ -12,6 +13,24 @@ export default function PenyuntingPengaturan() {
   const [aktif, setAktif] = useState(KELOMPOK_PENGATURAN[0].kunci)
   const [muat, setMuat] = useState(true)
   const [galat, setGalat] = useState('')
+  const [adaSuntingan, setAdaSuntingan] = useState(false)
+  const { konfirmasi } = usePanel()
+
+  async function pindahKelompok(kunci: string) {
+    if (kunci === aktif) return
+    if (adaSuntingan) {
+      const setuju = await konfirmasi({
+        judul: 'Pindah tanpa menyimpan?',
+        pesan: 'Perubahan pada kelompok yang sedang dibuka belum disimpan dan akan hilang.',
+        tombolYa: 'Ya, pindah',
+        tombolTidak: 'Lanjut menyunting',
+        bahaya: true,
+      })
+      if (!setuju) return
+    }
+    setAdaSuntingan(false)
+    setAktif(kunci)
+  }
 
   const ambilData = useCallback(async () => {
     setMuat(true)
@@ -39,7 +58,7 @@ export default function PenyuntingPengaturan() {
             <li key={k.kunci}>
               <button
                 type="button"
-                onClick={() => setAktif(k.kunci)}
+                onClick={() => pindahKelompok(k.kunci)}
                 className={`flex w-full items-center gap-2.5 rounded-xl px-4 py-2.5 text-left text-sm font-semibold transition ${
                   aktif === k.kunci ? 'bg-navy-950 text-white' : 'text-slate-600 hover:bg-slate-100'
                 }`}
@@ -55,35 +74,36 @@ export default function PenyuntingPengaturan() {
         key={kelompok.kunci}
         kelompok={kelompok}
         awal={semua[kelompok.kunci] ?? {}}
-        tersimpan={(nilai) => setSemua((s) => ({ ...s, [kelompok.kunci]: nilai }))}
+        tersimpan={(nilai) => { setSemua((s) => ({ ...s, [kelompok.kunci]: nilai })); setAdaSuntingan(false) }}
+        disunting={() => setAdaSuntingan(true)}
       />
     </div>
   )
 }
 
 function FormulirKelompok({
-  kelompok, awal, tersimpan,
-}: { kelompok: KelompokPengaturan; awal: Isi; tersimpan: (v: Isi) => void }) {
+  kelompok, awal, tersimpan, disunting,
+}: { kelompok: KelompokPengaturan; awal: Isi; tersimpan: (v: Isi) => void; disunting: () => void }) {
   const [nilai, setNilai] = useState<Isi>(awal)
   const [proses, setProses] = useState(false)
-  const [pesan, setPesan] = useState('')
-  const [galat, setGalat] = useState('')
+  const { beritahu } = usePanel()
 
   async function simpan(e: React.FormEvent) {
     e.preventDefault()
-    setProses(true); setPesan(''); setGalat('')
+    setProses(true)
     try {
       await apiAdmin(`/admin/pengaturan/${kelompok.kunci}`, { method: 'PUT', body: JSON.stringify(nilai) })
       tersimpan(nilai)
-      setPesan('Tersimpan. Perubahan tampil di situs setelah singgahan menyegar (maksimal 5 menit).')
+      beritahu(`${kelompok.label} tersimpan`, 'sukses', 'Perubahan tampil di situs setelah singgahan menyegar, maksimal 5 menit.')
     } catch (e) {
-      setGalat(e instanceof Error ? e.message : 'Gagal menyimpan')
+      beritahu('Gagal menyimpan', 'galat', e instanceof Error ? e.message : undefined)
     } finally {
       setProses(false)
     }
   }
 
   function ubahBidang(nama: string, v: any) {
+    disunting()
     setNilai((n) => ({ ...n, [nama]: v }))
   }
 
@@ -97,19 +117,12 @@ function FormulirKelompok({
       <div className="space-y-5">
         {kelompok.bidang.map((b) =>
           b.jenis === 'petaTeks' ? (
-            <PetaTeks key={b.nama} bidang={b as Extract<BidangP, { jenis: 'petaTeks' }>} nilai={nilai} ubah={setNilai} />
+            <PetaTeks key={b.nama} bidang={b as Extract<BidangP, { jenis: 'petaTeks' }>} nilai={nilai} ubah={(v) => { disunting(); setNilai(v) }} />
           ) : (
             <Bidang key={b.nama} bidang={b} nilai={nilai[b.nama]} ubah={(v) => ubahBidang(b.nama, v)} />
           ),
         )}
       </div>
-
-      {pesan && (
-        <p className="mt-5 flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-          <Centang className="h-4 w-4" /> {pesan}
-        </p>
-      )}
-      {galat && <p className="mt-5 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{galat}</p>}
 
       <div className="mt-7 flex items-center gap-3 border-t border-slate-100 pt-5">
         <button type="submit" disabled={proses} className="rounded-xl bg-emas-500 px-6 py-2.5 text-sm font-bold text-navy-950 transition hover:bg-emas-400 disabled:opacity-60">
@@ -124,6 +137,8 @@ function FormulirKelompok({
 const KELAS = 'w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emas-500 focus:ring-4 focus:ring-emas-500/10'
 
 function Bidang({ bidang, nilai, ubah }: { bidang: BidangP; nilai: any; ubah: (v: any) => void }) {
+  const { konfirmasi } = usePanel()
+
   if (bidang.jenis === 'grup') {
     return (
       <fieldset className="rounded-2xl border border-slate-200 p-5">
@@ -145,6 +160,15 @@ function Bidang({ bidang, nilai, ubah }: { bidang: BidangP; nilai: any; ubah: (v
   if (bidang.jenis === 'ulang') {
     const daftar: any[] = Array.isArray(nilai) ? nilai : []
     const ubahButir = (i: number, v: any) => ubah(daftar.map((x, j) => (j === i ? v : x)))
+    const hapusButir = async (i: number) => {
+      const setuju = await konfirmasi({
+        judul: 'Hapus butir ini?',
+        pesan: `Butir ke-${i + 1} pada “${bidang.label}” akan dihapus dari formulir.`,
+        tombolYa: 'Ya, hapus',
+        bahaya: true,
+      })
+      if (setuju) ubah(daftar.filter((_, j) => j !== i))
+    }
     return (
       <fieldset className="rounded-2xl border border-slate-200 p-5">
         <legend className="px-2 text-xs font-bold uppercase tracking-wide text-slate-500">{bidang.label}</legend>
@@ -167,7 +191,7 @@ function Bidang({ bidang, nilai, ubah }: { bidang: BidangP; nilai: any; ubah: (v
                     <Panah className="h-3.5 w-3.5 rotate-90" />
                   </button>
                   <button type="button" aria-label="Hapus"
-                    onClick={() => { if (confirm('Hapus butir ini?')) ubah(daftar.filter((_, j) => j !== i)) }}
+                    onClick={() => hapusButir(i)}
                     className="rounded-lg p-1.5 text-rose-500 hover:bg-rose-50">
                     <Silang className="h-3.5 w-3.5" />
                   </button>
@@ -245,6 +269,7 @@ function PetaTeks({ bidang, nilai, ubah }: { bidang: Extract<BidangP, { jenis: '
 
 function PilihGambar({ nilai, ubah }: { nilai: any; ubah: (v: any) => void }) {
   const [naik, setNaik] = useState(false)
+  const { beritahu } = usePanel()
 
   async function unggah(berkas: File) {
     setNaik(true)
@@ -254,8 +279,9 @@ function PilihGambar({ nilai, ubah }: { nilai: any; ubah: (v: any) => void }) {
       bentuk.append('folder', 'situs')
       const hasil = await apiAdmin<{ url: string }>('/admin/unggah', { method: 'POST', body: bentuk })
       ubah(hasil.url)
+      beritahu('Gambar terunggah', 'sukses', berkas.name)
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Gagal mengunggah')
+      beritahu('Gagal mengunggah', 'galat', e instanceof Error ? e.message : undefined)
     } finally {
       setNaik(false)
     }

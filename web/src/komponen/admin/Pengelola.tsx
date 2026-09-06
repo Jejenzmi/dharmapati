@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { apiAdmin, type Bidang, type Sumber } from '@/lib/admin'
 import { Panah, Silang } from '../ikon'
+import Halaman from './Halaman'
+import { usePanel } from './Panel'
 
 type Baris = Record<string, any>
 
@@ -22,6 +24,9 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
   const [galat, setGalat] = useState('')
   const [sunting, setSunting] = useState<Baris | null>(null)
   const [cari, setCari] = useState('')
+  const [halaman, setHalaman] = useState(1)
+  const [perHalaman, setPerHalaman] = useState(25)
+  const { konfirmasi, beritahu } = usePanel()
 
   const ambilData = useCallback(async () => {
     setMuat(true); setGalat('')
@@ -34,6 +39,9 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
     }
   }, [sumber.kunci])
 
+  // Kembali ke halaman pertama setiap kali pencarian atau sumber berubah
+  useEffect(() => { setHalaman(1) }, [cari, sumber.kunci])
+
   useEffect(() => { ambilData() }, [ambilData])
 
   const kolom = sumber.bidang.filter((b) => b.diTabel).slice(0, 5)
@@ -42,13 +50,29 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
     [data, cari],
   )
 
+  const totalHalaman = Math.max(1, Math.ceil(tersaring.length / perHalaman))
+  const halamanAman = Math.min(halaman, totalHalaman)
+  const terlihat = useMemo(
+    () => tersaring.slice((halamanAman - 1) * perHalaman, halamanAman * perHalaman),
+    [tersaring, halamanAman, perHalaman],
+  )
+
   async function hapus(baris: Baris) {
-    if (!confirm('Hapus data ini? Tindakan tidak dapat dibatalkan.')) return
+    const nama = sumber.bidang.map((b) => baris[b.nama]).find((v) => typeof v === 'string' && v.length) as string | undefined
+    const setuju = await konfirmasi({
+      judul: `Hapus ${sumber.label.toLowerCase()} ini?`,
+      pesan: nama ? `“${nama}” akan dihapus permanen dari basis data.` : 'Data akan dihapus permanen dari basis data.',
+      rincian: ['Tindakan ini tidak dapat dibatalkan.', 'Perubahan tampil di situs setelah singgahan menyegar.'],
+      tombolYa: 'Ya, hapus',
+      bahaya: true,
+    })
+    if (!setuju) return
     try {
       await apiAdmin(`/admin/data/${sumber.kunci}/${baris.id}`, { method: 'DELETE' })
+      beritahu('Data dihapus', 'sukses', nama)
       await ambilData()
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Gagal menghapus')
+      beritahu('Gagal menghapus', 'galat', e instanceof Error ? e.message : undefined)
     }
   }
 
@@ -102,7 +126,7 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
               </tr>
             ))}
 
-            {!muat && !tersaring.length && (
+            {!muat && !terlihat.length && (
               <tr>
                 <td colSpan={kolom.length + 1} className="px-5 py-16 text-center">
                   <p className="text-3xl" aria-hidden="true">{sumber.ikon}</p>
@@ -120,7 +144,7 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
               </tr>
             )}
 
-            {!muat && tersaring.map((b) => (
+            {!muat && terlihat.map((b) => (
               <tr key={b.id} className="transition hover:bg-slate-50/70">
                 {kolom.map((k) => (
                   <td key={k.nama} className="max-w-[260px] px-5 py-3.5 text-slate-700">
@@ -148,6 +172,16 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
             ))}
           </tbody>
         </table>
+
+        {!muat && tersaring.length > 0 && (
+          <Halaman
+            kini={halamanAman}
+            totalBaris={tersaring.length}
+            perHalaman={perHalaman}
+            ubahHalaman={setHalaman}
+            ubahPerHalaman={(n) => { setPerHalaman(n); setHalaman(1) }}
+          />
+        )}
       </div>
 
       {sunting && (
@@ -155,14 +189,18 @@ export default function Pengelola({ sumber }: { sumber: Sumber }) {
           sumber={sumber}
           awal={sunting}
           tutup={() => setSunting(null)}
-          selesai={async () => { setSunting(null); await ambilData() }}
+          selesai={async (baru) => {
+            setSunting(null)
+            beritahu(baru ? 'Data ditambahkan' : 'Perubahan tersimpan', 'sukses')
+            await ambilData()
+          }}
         />
       )}
     </div>
   )
 }
 
-function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Baris; tutup: () => void; selesai: () => void }) {
+function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Baris; tutup: () => void; selesai: (baru: boolean) => void }) {
   const [nilai, setNilai] = useState<Baris>(() => {
     const dasar: Baris = {}
     sumber.bidang.forEach((b) => {
@@ -172,14 +210,29 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
   })
   const [simpan, setSimpan] = useState(false)
   const [galat, setGalat] = useState('')
+  const [tersentuh, setTersentuh] = useState(false)
   const baru = !awal.id
+  const { konfirmasi, beritahu } = usePanel()
+
+  /** Tanyakan lebih dulu bila ada isian yang sudah diubah. */
+  const tutupAman = useCallback(async () => {
+    if (!tersentuh) { tutup(); return }
+    const setuju = await konfirmasi({
+      judul: 'Tutup tanpa menyimpan?',
+      pesan: 'Perubahan yang sudah Anda isi pada formulir ini akan hilang.',
+      tombolYa: 'Ya, tutup',
+      tombolTidak: 'Lanjut menyunting',
+      bahaya: true,
+    })
+    if (setuju) tutup()
+  }, [tersentuh, tutup, konfirmasi])
 
   useEffect(() => {
-    const tombol = (e: KeyboardEvent) => { if (e.key === 'Escape') tutup() }
+    const tombol = (e: KeyboardEvent) => { if (e.key === 'Escape') tutupAman() }
     window.addEventListener('keydown', tombol)
     document.body.style.overflow = 'hidden'
     return () => { window.removeEventListener('keydown', tombol); document.body.style.overflow = '' }
-  }, [tutup])
+  }, [tutupAman])
 
   async function kirim(e: React.FormEvent) {
     e.preventDefault()
@@ -197,16 +250,18 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
         baru ? `/admin/data/${sumber.kunci}` : `/admin/data/${sumber.kunci}/${awal.id}`,
         { method: baru ? 'POST' : 'PUT', body: JSON.stringify(muatan) },
       )
-      selesai()
+      selesai(baru)
     } catch (e) {
-      setGalat(e instanceof Error ? e.message : 'Gagal menyimpan')
+      const p = e instanceof Error ? e.message : 'Gagal menyimpan'
+      setGalat(p)
+      beritahu('Gagal menyimpan', 'galat', p)
     } finally {
       setSimpan(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-[960] flex justify-end bg-navy-950/50 backdrop-blur-sm" onClick={tutup}>
+    <div className="fixed inset-0 z-[960] flex justify-end bg-navy-950/50 backdrop-blur-sm" onClick={tutupAman}>
       <form
         onSubmit={kirim}
         onClick={(e) => e.stopPropagation()}
@@ -217,14 +272,14 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
             <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{sumber.label}</p>
             <h2 className="font-judul text-xl font-bold text-navy-900">{baru ? 'Tambah data' : 'Ubah data'}</h2>
           </div>
-          <button type="button" onClick={tutup} aria-label="Tutup" className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-navy-900">
+          <button type="button" onClick={tutupAman} aria-label="Tutup" className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-navy-900">
             <Silang className="h-5 w-5" />
           </button>
         </header>
 
         <div className="flex-1 space-y-4 overflow-y-auto px-7 py-6">
           {sumber.bidang.map((b) => (
-            <Isian key={b.nama} bidang={b} nilai={nilai[b.nama]} ubah={(v) => setNilai((n) => ({ ...n, [b.nama]: v }))} />
+            <Isian key={b.nama} bidang={b} nilai={nilai[b.nama]} ubah={(v) => { setTersentuh(true); setNilai((n) => ({ ...n, [b.nama]: v })) }} />
           ))}
           {galat && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{galat}</p>}
         </div>
@@ -233,7 +288,7 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
           <button type="submit" disabled={simpan} className="inline-flex items-center gap-2 rounded-xl bg-emas-500 px-6 py-2.5 text-sm font-bold text-navy-950 transition hover:bg-emas-400 disabled:opacity-60">
             {simpan ? 'Menyimpan…' : <>Simpan <Panah className="h-4 w-4" /></>}
           </button>
-          <button type="button" onClick={tutup} className="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Batal</button>
+          <button type="button" onClick={tutupAman} className="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-bold text-slate-600 transition hover:bg-slate-50">Batal</button>
         </footer>
       </form>
     </div>
@@ -285,6 +340,7 @@ function Isian({ bidang, nilai, ubah }: { bidang: Bidang; nilai: any; ubah: (v: 
 
 function PilihGambar({ nilai, ubah }: { nilai: any; ubah: (v: any) => void }) {
   const [naik, setNaik] = useState(false)
+  const { beritahu } = usePanel()
 
   async function unggah(berkas: File) {
     setNaik(true)
@@ -294,8 +350,9 @@ function PilihGambar({ nilai, ubah }: { nilai: any; ubah: (v: any) => void }) {
       bentuk.append('folder', 'situs')
       const hasil = await apiAdmin<{ url: string }>('/admin/unggah', { method: 'POST', body: bentuk })
       ubah(hasil.url)
+      beritahu('Gambar terunggah', 'sukses', berkas.name)
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Gagal mengunggah')
+      beritahu('Gagal mengunggah', 'galat', e instanceof Error ? e.message : undefined)
     } finally {
       setNaik(false)
     }

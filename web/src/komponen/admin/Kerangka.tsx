@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { ambilToken, apiAdmin, hapusToken, SUMBER } from '@/lib/admin'
 import { API_PERAMBAN } from '@/lib/api'
 import { Menu as IkonMenu, Panah, Silang } from '../ikon'
+import { usePanel } from './Panel'
 
 type Hitung = { pesanBaru: number; lamaranBaru: number }
 type Saya = { nama: string; peran: string }
@@ -25,6 +26,7 @@ export default function Kerangka({ children }: { children: React.ReactNode }) {
   const [hitung, setHitung] = useState<Hitung>({ pesanBaru: 0, lamaranBaru: 0 })
   const [saya, setSaya] = useState<Saya | null>(null)
   const [laci, setLaci] = useState(false)
+  const { konfirmasi, beritahu } = usePanel()
 
   const periksa = useCallback(async () => {
     if (!ambilToken()) { arahkan.replace('/admin'); return }
@@ -46,17 +48,35 @@ export default function Kerangka({ children }: { children: React.ReactNode }) {
   useEffect(() => { setLaci(false) }, [jalurKini])
 
   async function keluar() {
+    const setuju = await konfirmasi({
+      judul: 'Keluar dari panel?',
+      pesan: `Sesi ${saya?.nama ?? 'Anda'} akan diakhiri dan Anda kembali ke halaman masuk.`,
+      rincian: ['Pekerjaan yang belum disimpan akan hilang.'],
+      tombolYa: 'Ya, keluar',
+      bahaya: true,
+    })
+    if (!setuju) return
     await fetch(`${API_PERAMBAN}/api/auth/keluar`, { method: 'POST', credentials: 'include' }).catch(() => {})
     hapusToken()
     arahkan.replace('/admin')
   }
 
   async function bersihkanSinggahan() {
+    const setuju = await konfirmasi({
+      judul: 'Bersihkan singgahan situs?',
+      pesan: 'Halaman publik akan dibangun ulang dari basis data pada permintaan berikutnya.',
+      rincian: [
+        'Perubahan konten terbaru langsung tampil di situs.',
+        'Beberapa kunjungan pertama sedikit lebih lambat karena halaman dibuat ulang.',
+      ],
+      tombolYa: 'Bersihkan',
+    })
+    if (!setuju) return
     try {
       await apiAdmin('/admin/singgahan/bersihkan', { method: 'POST' })
-      alert('Singgahan dibersihkan. Perubahan akan tampil di situs dalam beberapa saat.')
+      beritahu('Singgahan dibersihkan', 'sukses', 'Perubahan akan tampil di situs dalam beberapa saat.')
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Gagal')
+      beritahu('Gagal membersihkan singgahan', 'galat', e instanceof Error ? e.message : undefined)
     }
   }
 
