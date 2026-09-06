@@ -113,7 +113,12 @@ export default function Kaki({ pengaturan }: { pengaturan: Pengaturan }) {
         </div>
 
         <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-slate-500 sm:flex-row">
-          <p>© {tahun} {p?.nama}. Seluruh hak cipta dilindungi.</p>
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span>© {tahun} {p?.nama}. Seluruh hak cipta dilindungi.</span>
+            <Link href="/kebijakan-privasi" className="text-slate-400 transition hover:text-white">
+              Kebijakan Privasi
+            </Link>
+          </p>
           <p className="flex items-center gap-4">
             <span>NPWP 94.187.081.8-409.000</span>
             <a

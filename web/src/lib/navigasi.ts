@@ -114,4 +114,5 @@ export const JALUR_STATIS: { jalur: string; prioritas: number; ubah: 'weekly' | 
   { jalur: '/faq', prioritas: 0.6, ubah: 'monthly' },
   { jalur: '/kontak', prioritas: 0.9, ubah: 'yearly' },
   { jalur: '/kontak/lokasi', prioritas: 0.7, ubah: 'yearly' },
+  { jalur: '/kebijakan-privasi', prioritas: 0.4, ubah: 'yearly' },
 ]
