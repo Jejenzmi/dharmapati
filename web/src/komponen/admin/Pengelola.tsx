@@ -261,11 +261,16 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
   }
 
   return (
-    <div className="fixed inset-0 z-[960] flex justify-end bg-navy-950/50 backdrop-blur-sm" onClick={tutupAman}>
+    <div
+      className="fixed inset-0 z-[960] flex items-center justify-center bg-navy-950/60 p-4 backdrop-blur-sm sm:p-6"
+      onClick={tutupAman}
+      role="dialog"
+      aria-modal="true"
+    >
       <form
         onSubmit={kirim}
         onClick={(e) => e.stopPropagation()}
-        className="flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl"
+        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl animate-naik flex-col overflow-hidden rounded-3xl bg-white shadow-2xl sm:max-h-[calc(100dvh-3rem)]"
       >
         <header className="flex items-center justify-between border-b border-slate-200 px-7 py-5">
           <div>
@@ -284,7 +289,7 @@ function Formulir({ sumber, awal, tutup, selesai }: { sumber: Sumber; awal: Bari
           {galat && <p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{galat}</p>}
         </div>
 
-        <footer className="flex items-center gap-3 border-t border-slate-200 px-7 py-5">
+        <footer className="flex items-center gap-3 border-t border-slate-200 bg-slate-50/60 px-7 py-5">
           <button type="submit" disabled={simpan} className="inline-flex items-center gap-2 rounded-xl bg-emas-500 px-6 py-2.5 text-sm font-bold text-navy-950 transition hover:bg-emas-400 disabled:opacity-60">
             {simpan ? 'Menyimpan…' : <>Simpan <Panah className="h-4 w-4" /></>}
           </button>
