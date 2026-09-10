@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ambilPengaturan } from '@/lib/api'
-import { FOTO } from '@/lib/foto'
 import { MENU } from '@/lib/navigasi'
 import { buatMetadata, DataTerstruktur, ldRemah } from '@/lib/seo'
 import { AjakanBertindak, JudulBagian, KepalaHalaman, Statistik, TautanSaudara } from '@/komponen/bagian'
@@ -25,6 +24,10 @@ export default async function ProfilPerusahaan() {
   const p = pengaturan.perusahaan
   const k = pengaturan.kontak
   const profil = pengaturan.profil
+  // Kolom foto hanya tampil bila panel admin memang mengisinya.
+  // Sebelumnya kolom ini jatuh ke gambar bawaan, sehingga menghapus foto lewat
+  // panel tidak berpengaruh apa pun di halaman.
+  const fotoProfil = profil?.gambar?.trim() || null
 
   return (
     <>
@@ -50,7 +53,7 @@ export default async function ProfilPerusahaan() {
       />
 
       <section className="py-20 sm:py-24">
-        <div className="wadah grid items-start gap-14 lg:grid-cols-[1fr_.85fr]">
+        <div className={`wadah grid items-start gap-14 ${fotoProfil ? 'lg:grid-cols-[1fr_.85fr]' : ''}`}>
           <div>
             <JudulBagian label="Sekilas" judul="Siapa kami" />
             <div className="prosa">
@@ -84,15 +87,17 @@ export default async function ProfilPerusahaan() {
             </div>
           </div>
 
-          <div className="relative">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl shadow-navy-900/10">
-              <Image src={profil?.gambar ?? FOTO.kantor} alt="Kantor pusat PT. Dharmapati Putra Nusantara di Purwakarta" fill sizes="(max-width:1024px) 100vw, 40vw" className="object-cover" />
+          {fotoProfil && (
+            <div className="relative">
+              <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-2xl shadow-navy-900/10">
+                <Image src={fotoProfil} alt="Kantor pusat PT. Dharmapati Putra Nusantara di Purwakarta" fill sizes="(max-width:1024px) 100vw, 40vw" className="object-cover" />
+              </div>
+              <div className="absolute -bottom-6 -right-4 rounded-2xl bg-navy-950 px-6 py-5 text-white shadow-xl">
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emas-400">Berdiri</p>
+                <p className="font-judul text-3xl font-bold">2016</p>
+              </div>
             </div>
-            <div className="absolute -bottom-6 -right-4 rounded-2xl bg-navy-950 px-6 py-5 text-white shadow-xl">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-emas-400">Berdiri</p>
-              <p className="font-judul text-3xl font-bold">2016</p>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
